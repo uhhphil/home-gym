@@ -1,0 +1,5 @@
+#!/bin/sh
+# nginx's entrypoint sources executable .envsh files before rendering its templates.
+# Existing Compose installs use PORT for the API. On Railway, set BACKEND_PORT=3000
+# and PORT=NGINX_PORT=8080 so the platform healthcheck reaches the public listener.
+export BACKEND_PORT="${BACKEND_PORT:-${PORT:-3000}}"

@@ -89,7 +89,9 @@ RUN apk add --no-cache bubblewrap \
 # refresh token has no business riding along in every archive that instruction produces. Owned
 # by `coach` because the job that writes it has already dropped to that user.
 RUN mkdir -p /coach-auth && chown coach:coach /coach-auth && chmod 700 /coach-auth
-VOLUME ["/coach-auth"]
+# Mount /coach-auth explicitly when using the optional coach target. Railway rejects
+# Dockerfile VOLUME instructions, including those in stages the build does not select.
+# The application data volume at /data is managed by the deployment platform.
 
 # ---------------------------------------------------------------------------------------------
 # Last, so that a plain `docker build ./api` keeps producing the runtime-free image.

@@ -102,7 +102,12 @@ function planEntry(stored, cfg, routine, { noProg = false } = {}) {
   // progresses from is read in that meaning, so a switch from "40 total" to per bell opens at
   // 20, not at 40 a hand. Only a switch between the two explicit meanings converts anything.
   const meaning = dbLoadFor(stored, cfg)
-  const st = historyAs(stored, cfg.id, meaning)
+  // A fixed-time circuit must open at its saved duration even when ordinary sessions
+  // start from the last log. This is a view of the same state, not a changed preference
+  // or excluded workout; missing/unknown overrides keep the profile's behaviour.
+  const startFrom = routine?.startFrom
+  const startingState = startFrom === 'plan' || startFrom === 'last' ? { ...stored, startFrom } : stored
+  const st = historyAs(startingState, cfg.id, meaning)
   // `plan` is kept on the entry purely so the workout can explain the number it chose.
   let plan = noProg ? { policy: 'off', kind: 'off' } : nextPrescription(st, cfg, routine)
   // The warm-up ramp and the prescription snap to the exercise's own increment (1.25 kg

@@ -79,6 +79,8 @@ jobs:
             api:
               - '.github/workflows/test.yml'
               - 'scripts/ci/**'
+              - 'scripts/home-gym/**'
+              - 'web/**'
               - 'api/**'
               - 'website/api.html'
               - 'scripts/build-api-docs.mjs'
@@ -221,6 +223,8 @@ jobs:
           --test-reporter=lcov --test-reporter-destination=lcov.info
           --test-reporter=junit --test-reporter-destination=junit.xml
           test/*.test.js
+      - name: Home gym reconciliation tests
+        run: node --test scripts/home-gym/*.test.mjs
       # The api's copy of the exercise catalogue is generated and committed. A dataset change
       # that forgets to regenerate it would surface as "the Coach can't find that exercise".
       - name: Generated Coach assets are current
