@@ -11,13 +11,19 @@ Two services deploy from main:
 - home-gym: repository root, web/Dockerfile. Set PORT=8080, NGINX_PORT=8080, BACKEND_PORT=3000, BACKEND=api.railway.internal. PORT is Railway's public listener/healthcheck port; BACKEND_PORT is the private API port. The nginx resolver must support IPv6.
 - api: root /api, Dockerfile, PORT=3000, DATA_DIR=/data. Persistent Railway volume mounted at /data. No public API domain.
 
-Passkey RP_ID and ORIGIN must match the app domain. Guest access is disabled. Automatic first-user admin is disabled so a stranger cannot claim administration before the owner signs up. After Phil registers, promote his exact user ID through ADMIN_UIDS and then enable INVITE_ONLY=1 for personal-only registration. Do not publish user IDs, passwords or credentials in this repository.
+Passkey RP_ID and ORIGIN must match the app domain; API startup logs confirm they do. Required access settings are ALLOW_GUEST=0 and FIRST_USER_ADMIN=0 so a stranger cannot claim administration before the owner signs up. Live `/api/config` confirms guest access is disabled. FIRST_USER_ADMIN=0 was explicitly saved through Railway for the documentation follow-up deployment, since the connector redacts existing values. Phil chose to set up his profile later, so no account was created and registration remains open. When ready, he must create the passkey on his phone and complete the Face ID/passkey prompt. After registration and login succeed, promote his exact user ID through ADMIN_UIDS and then enable INVITE_ONLY=1 for personal-only registration. These owner-onboarding steps are pending. Do not publish user IDs, passwords or credentials in this repository.
 
 Back up /data before destructive changes. A volume survives deployments but is not a backup.
 
 ### Verification on 2026-11-08
 
-Both Railway services were offline with failed deployments. The API build rejected the optional coach stage's Docker VOLUME instruction; the web image built and started nginx but failed its healthcheck. Source fixes remove the unsupported instruction and separate public/private ports. These changes are not proof of a successful redeployment. See [the deployment audit](docs/home-gym/deployment-and-integrations.md) for evidence, remaining authentication/backup checks, and native integration boundaries.
+The initial read-only audit found both Railway services offline with failed deployments. The API build rejected the optional coach stage's Docker VOLUME instruction; the web image built and started nginx but failed its healthcheck.
+
+The fixes and first home-gym additions merged through [PR #1](https://github.com/uhhphil/home-gym/pull/1) as `a503d0b7da4817864ffbdc7b4f59eaaee5c756b1`, after the [full Tests workflow](https://github.com/uhhphil/home-gym/actions/runs/42518210121) passed, including actual container image smoke checks. The approved web port settings above were applied, and **both services reached SUCCESS on the merged commit**, verified around 3:21 p.m. Eastern (20:20:51 UTC).
+
+The live browser shows openGym's passkey login screen. Proxied `/api/health` reports `ok: true`, `users: 0`, `writable: true`; `/api/config` confirms guest access disabled and invitation-only registration still disabled. Root, health, configuration, and static JavaScript/CSS responses succeed. Railway reports both services ONLINE, one running and zero crashed replicas each, no pending work, and zero current warning/critical counts. This verifies deployment, transport, and storage writability, not authenticated workout persistence or backup restoration. No production account or workout was manually added. Owner registration, promotion, and invitation-only lockdown remain postponed at the owner's request.
+
+The [iOS workflow gate](https://github.com/uhhphil/home-gym/actions/runs/42518210131) passed with native jobs skipped; no native-device integration is claimed. See [the deployment audit](docs/home-gym/deployment-and-integrations.md) for deployment identifiers, live evidence, remaining authentication/backup checks, and native integration boundaries.
 
 ## Development scope
 
