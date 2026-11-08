@@ -32,6 +32,34 @@ final class OpenGymUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", prefix)).firstMatch
     }
 
+    /// Home is scrollable: its workout and body-weight controls can be below the
+    /// fixed tab bar. Scroll the page like a user before tapping, with a bounded
+    /// attempt count so an actually missing or covered control still fails.
+    private func tapHomeControl(_ element: XCUIElement, _ what: String) {
+        XCTAssertTrue(element.waitForExistence(timeout: 15), "\(what) did not show up")
+        let window = app.windows.firstMatch
+        for _ in 0..<6 {
+            if element.isHittable { element.tap(); return }
+            let upward = element.frame.midY >= window.frame.midY
+            let start = CGVector(dx: 0.5, dy: upward ? 0.65 : 0.3)
+            let end = CGVector(dx: 0.5, dy: upward ? 0.3 : 0.65)
+            window.coordinate(withNormalizedOffset: start)
+                .press(forDuration: 0.05, thenDragTo: window.coordinate(withNormalizedOffset: end))
+        }
+        XCTAssertTrue(element.isHittable, "\(what) was not reachable after scrolling Home")
+        element.tap()
+    }
+
+    /// XCTest retries keep the app's saved state. A preceding attempt may have
+    /// loaded the plan successfully before failing later in the workout.
+    private func loadStarterPlanIfNeeded() {
+        let load = app.buttons["Load starter plan"]
+        if load.waitForExistence(timeout: 5) {
+            tapHomeControl(load, "Load starter plan")
+            tap(button(startingWith: "Full Body"), "the Full Body plan")
+        }
+    }
+
     /**
      * Full Body A from the start chooser (views/Workout.jsx StartChooser). On a day the starter plan
      * schedules it (a Monday) it is today's plan, a card whose name is only a title and whose
@@ -137,9 +165,8 @@ final class OpenGymUITests: XCTestCase {
         app.launch()
         chooseLocal()
         shot("1-home")
-        tap(app.buttons["Load starter plan"], "Load starter plan")
-        tap(button(startingWith: "Full Body"), "the Full Body plan")
-        tap(app.buttons["Choose a different workout"], "Choose a different workout")
+        loadStarterPlanIfNeeded()
+        tapHomeControl(app.buttons["Choose a different workout"], "Choose a different workout")
         startFullBodyA()
         shot("2-workout")
         let tick = app.switches["Set 1 done"]
@@ -199,11 +226,8 @@ final class OpenGymUITests: XCTestCase {
         if !finish.waitForExistence(timeout: 5) {
             // Nothing running (test2 failed early or ran alone): start one the way test2 does.
             XCTAssertTrue(home.waitForExistence(timeout: 30), "home did not show")
-            if app.buttons["Load starter plan"].waitForExistence(timeout: 5) {
-                tap(app.buttons["Load starter plan"], "Load starter plan")
-                tap(button(startingWith: "Full Body"), "the Full Body plan")
-            }
-            tap(app.buttons["Choose a different workout"], "Choose a different workout")
+            loadStarterPlanIfNeeded()
+            tapHomeControl(app.buttons["Choose a different workout"], "Choose a different workout")
             startFullBodyA()
             tap(app.switches["Set 1 done"], "Set 1 done")
             allowSystemAlert(within: 5)
@@ -254,7 +278,7 @@ final class OpenGymUITests: XCTestCase {
     func test1WeighInSheetStaysAboveTheKeyboard() {
         app.launch()
         chooseLocal()
-        tap(app.buttons["Log"], "Log (body weight)")
+        tapHomeControl(app.buttons["Log"], "Log (body weight)")
         let field = app.textFields.firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: 15), "no weight field")
         // The sheet slides in; wait until the field is where a finger can reach it.

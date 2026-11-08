@@ -33,6 +33,7 @@ jobs:
       pull-requests: read
     outputs:
       run: ${{ steps.decide.outputs.run }}
+      watch: ${{ steps.f.outputs.watch }}
     steps:
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: f
@@ -54,6 +55,14 @@ jobs:
               - 'frontend/src/lib/voice.js'
               - 'frontend/src/lib/live-activity.js'
               - '.github/workflows/ios.yml'
+            watch:
+              - 'frontend/ios/App/Watch/**'
+              - 'frontend/ios/App/WatchCore/**'
+              - 'frontend/ios/App/WatchWidgets/**'
+              - 'frontend/ios/App/App/WatchBridgePlugin.swift'
+              - 'frontend/ios/ci/add-watch-app.rb'
+              - 'frontend/ios/ci/watch-strings.mjs'
+              - 'frontend/src/lib/watch-sync.js'
       - id: decide
         env:
           EVENT: ${{ github.event_name }}
@@ -179,8 +188,12 @@ jobs:
           # The extension really is in the app, with its own Info.plist.
           test -f build/dd/Build/Products/Debug-iphonesimulator/App.app/PlugIns/OpenGymWidgets.appex/Info.plist || { echo "::error::no widget extension in the app"; exit 1; }
       # The watch app on its own in a watch simulator, with the demo session it carries
-      # (SessionStore.demoJSON: text only, no exercise media), for a look at it.
+      # (SessionStore.demoJSON: text only, no exercise media), for a look at it. Only these
+      # optional pictures/performance samples depend on watch changes in a PR: compilation,
+      # core tests, launch, widgets and the separate UI-test job always keep their existing gate.
+      # Pushes and manual builds still collect the complete set of preview artifacts.
       - name: Show the watch app
+        if: github.event_name != 'pull_request' || needs.gate.outputs.watch == 'true'
         continue-on-error: true
         # Pictures only: a hung simulator here must not hold the job to its 60-minute limit.
         timeout-minutes: 30
@@ -254,6 +267,7 @@ jobs:
       # Clean pictures for the App Store and promotion: Ultra and 46 mm, the clock at 10:09, demo data,
       # the synthetic clip or none (never exercise media).
       - name: Watch promo pictures
+        if: github.event_name != 'pull_request' || needs.gate.outputs.watch == 'true'
         continue-on-error: true
         # Pictures only: a hung simulator here must not hold the job to its 60-minute limit.
         timeout-minutes: 30
