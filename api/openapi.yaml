@@ -101,6 +101,9 @@ info:
     - `INTEGRATIONS` (unset by default, e.g. `webhook`): the providers of the `integrations`
       routes, and the `integrations` block of `GET /api/config`. `INTEGRATIONS_ALLOW_LAN=1`
       lets a webhook reach the home network (http too), never loopback or link-local.
+    - `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET`, `WHOOP_REDIRECT_URI`: enable the separate
+      read-only WHOOP account integration. The redirect must match ORIGIN and end in
+      `/api/whoop/callback`. Secrets are server-only.
     - `MEDIA_UPLOADS` (default on; `0` removes the `media` routes and the `media` block of
       `GET /api/config`), `MEDIA_QUOTA_MB` (200 per profile, `0` = no cap),
       `MEDIA_IMAGE_MAX_MB` (2), `MEDIA_GIF_MAX_MB` (8), `MEDIA_VIDEO_MAX_MB` (40),
@@ -111,7 +114,7 @@ info:
     ### Conventions
     - Every response body is JSON with `Cache-Control: no-store`. The one exception is
       `GET /api/media/{hash}`, which answers with the stored file itself
-      (`Cache-Control: private, no-store`).
+      (`Cache-Control: private, no-store`). WHOOP callback returns a fixed 303 local redirect.
     - Errors are always `{"error": "<human-readable message>"}`. The `password`, throttle and
       `media` routes add a stable `code` for the client to word in its own language.
     - Unknown method+path pairs return `404 {"error":"not found"}`; an unhandled
@@ -2488,6 +2491,110 @@ paths:
               schema: { $ref: '#/components/schemas/Ok' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /api/whoop/status:
+    get:
+      tags: [integrations]
+      operationId: whoopStatus
+      summary: Read the caller's WHOOP connection and cached summaries
+      description: No provider network request. Tokens are never returned. Not part of workout state.
+      responses:
+        '200':
+          description: Configuration, connection and last complete 30-day snapshot.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WhoopStatus' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/whoop/authorize:
+    post:
+      tags: [integrations]
+      operationId: whoopAuthorize
+      summary: Start WHOOP authorization for the signed-in browser profile
+      description: |
+        Requires WHOOP_CLIENT_ID, WHOOP_CLIENT_SECRET and WHOOP_REDIRECT_URI on the server.
+        Returns only the official authorization URL and sets an HttpOnly, SameSite=Lax
+        callback binding cookie. State expires in ten minutes and can be redeemed once.
+        Use the browser, not the paired native app, to complete this flow.
+      responses:
+        '200':
+          description: Authorization URL and callback binding cookie.
+          headers:
+            Set-Cookie: { schema: { type: string } }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url: { type: string, format: uri }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { description: Too many authorization attempts. }
+        '503': { description: WHOOP is not configured. }
+
+  /api/whoop/callback:
+    get:
+      tags: [integrations]
+      operationId: whoopCallback
+      summary: Redeem WHOOP authorization for the same browser and profile
+      parameters:
+        - in: query
+          name: state
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 8 }
+        - in: query
+          name: code
+          schema: { type: string, maxLength: 2048 }
+        - in: query
+          name: error
+          schema: { type: string }
+      responses:
+        '303':
+          description: Fixed local redirect to integrations with whoop=connected or whoop=error. Clears the binding cookie; never returns tokens.
+          headers:
+            Location: { schema: { type: string } }
+            Set-Cookie: { schema: { type: string } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/whoop/sync:
+    post:
+      tags: [integrations]
+      operationId: whoopSync
+      summary: Refresh a complete 30-day WHOOP snapshot
+      description: |
+        Fetches all bounded pages of cycles, recoveries, sleeps and workouts; replaces the
+        snapshot only after all succeed. Concurrent calls share one sync and token refresh.
+        Maximum 20 pages / 500 records per resource, 1 MiB per response, 2 MiB per cache,
+        and 90 seconds per sync. Provider IDs stay unchanged. Does not add gym workouts.
+      responses:
+        '200':
+          description: Updated connection and snapshot.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WhoopStatus' }
+        '401': { description: Sign-in or WHOOP reconnection required. }
+        '409': { description: Missing or changed WHOOP connection. }
+        '429': { description: Local or WHOOP rate limit. Retry-After is seconds. }
+        '502': { description: Provider or response failure; previous complete snapshot retained. }
+        '503': { description: WHOOP is not configured. }
+
+  /api/whoop/disconnect:
+    post:
+      tags: [integrations]
+      operationId: whoopDisconnect
+      summary: Delete the caller's WHOOP tokens and cached summaries
+      description: Cancels pending writes and attempts provider revocation. Does not modify workouts.
+      responses:
+        '200':
+          description: Local data removed. If revocation failed, also revoke the app in WHOOP settings.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, revokeRequired]
+                properties:
+                  ok: { type: boolean, const: true }
+                  revokeRequired: { type: boolean }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
   /api/integrations:
     get:
       tags: [integrations]
@@ -3986,6 +4093,87 @@ components:
           example: { error: "that code is wrong, used or expired", code: "link-invalid" }
 
   schemas:
+    WhoopStatus:
+      type: object
+      required: [configured, connected, lastSync, error, data]
+      properties:
+        configured: { type: boolean }
+        connected: { type: boolean }
+        lastSync: { type: [integer, 'null'], description: Unix epoch milliseconds. }
+        error: { type: [string, 'null'], description: Safe human-readable connection error. }
+        data:
+          oneOf:
+            - { type: 'null' }
+            - { $ref: '#/components/schemas/WhoopSnapshot' }
+
+    WhoopSnapshot:
+      type: object
+      description: Read-only provider observations; unavailable scores are null, never inferred as zero.
+      required: [accountId, syncedAt, cycles, recoveries, sleeps, workouts]
+      properties:
+        accountId: { type: string }
+        syncedAt: { type: integer, description: Unix epoch milliseconds. }
+        cycles:
+          type: array
+          maxItems: 500
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              start: { type: string, format: date-time }
+              end: { type: [string, 'null'] }
+              updatedAt: { type: [string, 'null'] }
+              scoreState: { type: [string, 'null'] }
+              strain: { type: [number, 'null'] }
+              averageHeartRate: { type: [number, 'null'] }
+              stepCount: { type: [number, 'null'] }
+        recoveries:
+          type: array
+          maxItems: 500
+          items:
+            type: object
+            properties:
+              id: { type: string, description: Original sleep_id; recovery has no independent provider ID. }
+              sleepId: { type: string }
+              cycleId: { type: [integer, 'null'] }
+              createdAt: { type: [string, 'null'] }
+              updatedAt: { type: [string, 'null'] }
+              scoreState: { type: [string, 'null'] }
+              score: { type: [number, 'null'] }
+              hrv: { type: [number, 'null'], description: RMSSD milliseconds. }
+              restingHeartRate: { type: [number, 'null'] }
+        sleeps:
+          type: array
+          maxItems: 500
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              start: { type: string, format: date-time }
+              end: { type: [string, 'null'] }
+              updatedAt: { type: [string, 'null'] }
+              scoreState: { type: [string, 'null'] }
+              nap: { type: [boolean, 'null'] }
+              performance: { type: [number, 'null'] }
+              sleepMs: { type: [number, 'null'], description: Light plus deep plus REM sleep milliseconds; excludes awake time. }
+        workouts:
+          type: array
+          maxItems: 500
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              start: { type: string, format: date-time }
+              end: { type: [string, 'null'] }
+              updatedAt: { type: [string, 'null'] }
+              scoreState: { type: [string, 'null'] }
+              sport: { type: [string, 'null'] }
+              strain: { type: [number, 'null'] }
+              averageHeartRate: { type: [number, 'null'] }
+              maxHeartRate: { type: [number, 'null'] }
+              distanceMeters: { type: [number, 'null'] }
+              kilojoules: { type: [number, 'null'] }
+
     IntegrationEvent:
       type: string
       enum: [workout.finished, workout.pr, weighin.logged]

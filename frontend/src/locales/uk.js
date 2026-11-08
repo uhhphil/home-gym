@@ -1,5 +1,6 @@
 // Ukrainian UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "WHOOP": "WHOOP",
   "Same muscle and exercise type. The movement may differ.": "Той самий м’яз і тип вправи. Рух може відрізнятися.",
   "Related muscles and exercise type. The movement may differ.": "Пов’язані м’язи й той самий тип вправи. Рух може відрізнятися.",
   "Same muscle, different exercise type. Check suitability.": "Той самий м’яз, інший тип вправи. Перевірте, чи вона підходить.",

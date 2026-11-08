@@ -38,3 +38,9 @@ Local setup: follow upstream README and docker-compose.yml. The original source 
 The owner's selected setup is barbell and plates, dumbbells, adjustable bench, squat rack, and pull-up bar, with pounds and miles. Home → My equipment offers this selectable preset. Kettlebells and exact weight inventories are not assumed. Applying the preset creates a normal equipment profile and converts existing weight values with the app's existing unit-conversion flow.
 
 The [feature comparison](docs/home-gym/COMPARISON.md) documents all three inspected repositories and separate code/media licenses. Reference clones live outside production in `/private/tmp/home-gym-references/`. They are not bundled or needed to run the app. [Validation and local launch notes](docs/home-gym/VALIDATION.md) describe the first tested additions.
+
+## WHOOP
+
+The owner uses an iPhone and WHOOP 5.0. Account-sync and foreground Bluetooth implementations are documented in [WHOOP setup and verification](docs/home-gym/WHOOP.md). Account sync remains disabled until the WHOOP client ID, client secret and exact callback URI are configured on Railway's API service. Those variable names were absent when checked on 2026-11-08. Do not put the client secret in the web service or repository.
+
+The web app can show account summaries after authorization. Safari on iPhone cannot use Web Bluetooth; live HR needs this repository's updated native iOS build. Xcode compilation, signing, installation and real-band verification remain pending. No WHOOP data has been read from the owner's account yet.

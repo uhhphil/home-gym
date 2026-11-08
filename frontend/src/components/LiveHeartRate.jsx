@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react'
 import { t } from '../lib/i18n.js'
 import { liveHeartRate, onLiveHeartRate } from '../lib/phone-workout.js'
+import { bluetoothHeartRateSnapshot, subscribeBluetoothHeartRate } from '../lib/bluetooth-heart-rate.js'
 
-// " · ♥ 128" in the workout header while the iPhone's own workout session (#818) has a fresh
-// reading from AirPods that measure it. Nothing at all without one: on the web, on Android, with an
-// Apple Watch doing the measuring (the watch shows its own), or with the buds back in their case.
-export default function LiveHeartRate() {
-  const [hr, setHr] = useState(() => liveHeartRate())
+// Prefer the explicitly connected Bluetooth monitor while it has a fresh reading.
+// Otherwise retain the iPhone workout session's AirPods/phone source (#818).
+const currentReading = phoneEnabled => bluetoothHeartRateSnapshot().reading || (phoneEnabled ? liveHeartRate() : null)
+export default function LiveHeartRate({ phoneEnabled = true }) {
+  const [hr, setHr] = useState(() => currentReading(phoneEnabled))
   useEffect(() => {
-    const off = onLiveHeartRate(() => setHr(liveHeartRate()))
-    // A reading over a minute old goes away even when no new one comes (AirPods taken out).
-    const iv = setInterval(() => { if (!document.hidden) setHr(liveHeartRate()) }, 15000)
-    return () => { off(); clearInterval(iv) }
-  }, [])
+    const refresh = () => setHr(currentReading(phoneEnabled))
+    const off = onLiveHeartRate(refresh)
+    const offBluetooth = subscribeBluetoothHeartRate(refresh)
+    // The phone source expires after a minute; BLE publishes its own 15s expiry.
+    const iv = setInterval(refresh, 15000)
+    document.addEventListener('visibilitychange', refresh)
+    refresh()
+    return () => { off(); offBluetooth(); clearInterval(iv); document.removeEventListener('visibilitychange', refresh) }
+  }, [phoneEnabled])
   if (!hr) return null
-  return <> · <span className="live-hr" aria-label={t('Heart rate') + ' ' + hr.bpm}>♥ {hr.bpm}</span></>
+  const source = hr.source === 'bluetooth' ? hr.deviceName : t('Phone workout')
+  return <> · <span className="live-hr" title={source} aria-label={t('Heart rate') + ' ' + hr.bpm + ' · ' + source}>♥ {hr.bpm}</span></>
 }

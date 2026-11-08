@@ -86,6 +86,8 @@
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Used to reach your own openGym server or AI model on your home network, when you connect one.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Used to find a heart-rate monitor you choose, such as your WHOOP, and show its live heart rate while this app is open.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to scan your gym membership QR code, to take a photo or video of an exercise you add yourself, and to film a set so you can check your form.</string>
 	<key>NSMicrophoneUsageDescription</key>

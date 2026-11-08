@@ -18,6 +18,7 @@ import Icon from '../components/Icon.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { Section, Row, Switch, Button, TextField } from '../components/ui.jsx'
 import { isOn } from '../lib/modules.js'
+import { whoopSheet } from '../components/Whoop.jsx'
 
 /* Settings → Integrations (v1.4.4): one directory of what openGym can talk to, grouped, each card
    with what it is, whether it is on, and the one thing to do next. The cards are thin on purpose:
@@ -126,10 +127,20 @@ export default function IntegrationsPage({ android = false, ios = false }) {
   }
   const dir = directory(ctx)
 
+  useEffect(() => {
+    const result = new URLSearchParams(window.location.hash.split('?')[1] || '').get('whoop')
+    if (result === 'connected' || result === 'error') {
+      nav('/settings/integrations', { replace: true })
+      if (result === 'error') toast?.(t('WHOOP could not be connected. Try again.'))
+      whoopSheet()
+    }
+  }, [nav, toast])
+
   const webhookCtx = { server, lan: !!config?.integrations?.lan, toast }
   const act = card => {
     const { action, status } = card.state
     switch (card.id) {
+      case 'whoop': return whoopSheet()
       case 'apple-health': case 'health-connect':
         if (status === 'device') return infoSheet(card, t('This one lives in the openGym phone app: Apple Health on iPhone, Health Connect on Android.'))
         return nav('/settings/' + card.id)
@@ -149,6 +160,7 @@ export default function IntegrationsPage({ android = false, ios = false }) {
     }
   }
   const open = card => {
+    if (card.id === 'whoop') return whoopSheet()
     // The health stores and the webhooks have more to say than a card holds.
     if (card.state.status === 'device' || card.state.status === 'server' || card.state.action === 'open' && card.id === 'webhook') return act(card)
     if (card.id === 'webhook') return card.state.action === 'connect' ? detailSheet(card, { act: () => act(card) }) : webhookListSheet(webhookCtx)
