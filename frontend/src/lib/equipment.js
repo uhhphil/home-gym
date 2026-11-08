@@ -31,7 +31,7 @@ export const ALL_EQUIPMENT = (() => {
   const ranked = Object.keys(c).sort((a, b) => c[b] - c[a] || (a < b ? -1 : 1))
   // Clubbell and macebell have no catalogue entries yet (issue #393). They still belong on the
   // profile checklist and the custom-exercise chips, after everything the catalogue already uses.
-  for (const extra of ['clubbell', 'macebell']) if (!ranked.includes(extra)) ranked.push(extra)
+  for (const extra of ['clubbell', 'macebell', 'squat rack']) if (!ranked.includes(extra)) ranked.push(extra)
   return ranked.concat(ACCESSORIES)
 })()
 

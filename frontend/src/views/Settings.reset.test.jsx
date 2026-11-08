@@ -157,6 +157,8 @@ describe('Settings — footer', () => {
   it('links the source code to its home on GitHub, on About & updates', () => {
     act(() => root.render(<Settings page="about" />))
     const link = [...host.querySelectorAll('a')].find(a => a.textContent === 'Source code')
-    expect(link.getAttribute('href')).toBe('https://github.com/DuarteSantos8/openGym')
+    expect(link.getAttribute('href')).toBe('https://github.com/uhhphil/home-gym')
+    const upstream = [...host.querySelectorAll('a')].find(a => a.textContent === 'openGym upstream')
+    expect(upstream.getAttribute('href')).toBe('https://github.com/DuarteSantos8/openGym')
   })
 })

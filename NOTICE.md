@@ -3,6 +3,10 @@
 openGym — Copyright (C) 2026 Duarte Santos.
 openGym's own code is licensed under the **GNU AGPL v3.0** (see [LICENSE](LICENSE)).
 
+## Personal home-gym fork
+
+Modified 2026-11-08 in [uhhphil/home-gym](https://github.com/uhhphil/home-gym): home equipment setup, manual walking/running entry, timed circuit creation, dataset reconciliation tooling, and Railway deployment compatibility. Original attribution and licenses remain intact. These changes use openGym's architecture and existing license; no Skulpt code or third-party exercise photos were copied. The source and media reviews are in [docs/home-gym/COMPARISON.md](docs/home-gym/COMPARISON.md).
+
 ## App store exception
 
 As an additional permission under section 7 of the AGPL v3.0, the copyright holder permits

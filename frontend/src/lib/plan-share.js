@@ -38,6 +38,10 @@ const PROGRAMME_FMT = 1
 const WEEK_DAYS = [1, 2, 3, 4, 5, 6, 0]   // every getDay() index; only the reader's own
                                           // screen puts them in an order (see weekOrder)
 const PLAN_UNITS = new Set(['kg', 'lb'])
+// A routine may own its starting prescriptions (timed circuits need their planned seconds).
+// Omit unknown values so older plans and malformed files keep the profile's default.
+const routineStartFrom = startFrom => startFrom === 'plan' || startFrom === 'last' ? { startFrom } : {}
+const cleanAutoHold = e => modeOf(e) === 'time' && typeof e.autoHold === 'boolean' ? { autoHold: e.autoHold } : {}
 
 // A plan's numbers are in the unit that wrote it. Missing unit is deliberately legacy-compatible:
 // old files were read as already being in the recipient's unit, so keep their values unchanged.
@@ -95,6 +99,7 @@ function cleanEx(e) {
     o.mode = 'time'
     if (e.sec != null) o.sec = e.sec
     if (e.weight) o.weight = e.weight
+    Object.assign(o, cleanAutoHold(e))
   } else {
     if (e.reps != null) o.reps = e.reps
     if (e.weight) o.weight = e.weight
@@ -245,6 +250,7 @@ export function buildPlanBundle(S, name) {
   if (!unit) unitError()
   const routines = (S.routines || []).map(r => ({
     id: r.id, name: r.name, emoji: r.emoji,
+    ...routineStartFrom(r.startFrom),
     ...(r.prog ? { prog: r.prog } : {}),
     ...(r.excludeFromProgression === true ? { excludeFromProgression: true } : {}),
     ex: (r.ex || []).map(cleanEx)
@@ -300,8 +306,9 @@ export function parsePlan(raw, destinationUnit = 'kg') {
   const customEx = (Array.isArray(data.customEx) ? data.customEx : []).filter(c => c && c.id)
   const known = new Set(customEx.map(c => c.id))
   let dropped = 0
-  const routines = data.routines.filter(r => r && Array.isArray(r.ex)).map(r => ({
+  const routines = data.routines.filter(r => r && Array.isArray(r.ex)).map(({ startFrom, ...r }) => ({
     ...r,
+    ...routineStartFrom(startFrom),
     ex: r.ex.filter(e => {
       const ok = !!e && (known.has(e.id) || !!EXIDX[e.id])
       if (!ok) dropped++
@@ -328,8 +335,9 @@ export function parsePlan(raw, destinationUnit = 'kg') {
       const pyramidRest = pyramid.length ? normalizePyramidRest(e.pyramidRest, pyramid.length) : []
       const pyramidWeight = pyramid.length ? normalizePyramidWeight(e.pyramidWeight, pyramid.length) : []
       const warmChoice = cleanWarmupChoice(e)
-      const { warmupSets, warmup: _warmup, warmupRows: _warmupRows, intensifier, restSec, restOff: _restOff, warmupRestSec, warmupRestOff: _warmOff, sideRestSec: _sideRest, sideRestOff: _sideOff, subs: _subs, pyramid: _pyramid, pyramidRest: _pyramidRest, pyramidWeight: _pyramidWeight, sgName: _sgName, sgRest: _sgRest, incline: _incline, ...passthrough } = e
+      const { autoHold: _autoHold, warmupSets, warmup: _warmup, warmupRows: _warmupRows, intensifier, restSec, restOff: _restOff, warmupRestSec, warmupRestOff: _warmOff, sideRestSec: _sideRest, sideRestOff: _sideOff, subs: _subs, pyramid: _pyramid, pyramidRest: _pyramidRest, pyramidWeight: _pyramidWeight, sgName: _sgName, sgRest: _sgRest, incline: _incline, ...passthrough } = e
       if (!known.has(passthrough.id)) passthrough.id = canonicalExId(passthrough.id)
+      Object.assign(passthrough, cleanAutoHold(e))
       return convertedExercise({ ...passthrough, ...(pyramid.length ? { pyramid } : {}), ...(pyramidRest.length ? { pyramidRest } : {}), ...(pyramidWeight.length ? { pyramidWeight } : {}), ...(warm ? { warmupSets: warm } : {}), ...warmChoice, ...(intens ? { intensifier: intens } : {}), ...(rest ? { restSec: rest } : restOff ? { restOff: true } : {}), ...(warmOff ? { warmupRestOff: true } : warmRest ? { warmupRestSec: warmRest } : {}), ...(sideOff ? { sideRestOff: true } : sideRest ? { sideRestSec: sideRest } : {}), ...(subs.length ? { subs } : {}), ...(sgName ? { sgName } : {}), ...(sgRest ? { sgRest } : {}), ...(incline > 0 ? { incline } : {}) }, sourceUnit || destination, destination)
     })
   }))
@@ -390,9 +398,13 @@ export function mergePlan(s, bundle, { schedule } = {}) {
       id: nid,
       name: r.name || t('Shared routine'),
       emoji: r.emoji,
+      ...routineStartFrom(r.startFrom),
       ...(r.prog ? { prog: r.prog } : {}),
       ...(r.excludeFromProgression === true ? { excludeFromProgression: true } : {}),
-      ex: (r.ex || []).map(e => ({ ...e, id: exIdMap[e.id] || canonicalExId(e.id) }))
+      ex: (r.ex || []).map(e => {
+        const { autoHold, ...rest } = e
+        return { ...rest, ...cleanAutoHold(e), id: exIdMap[e.id] || canonicalExId(e.id) }
+      })
     })
   })
   if (schedule) {

@@ -30,6 +30,10 @@ import { WrappedHomeCard } from '../components/WrappedEntry.jsx'
 import RecoveryHint from '../components/RecoveryHint.jsx'
 import { ChallengesCard } from '../components/Challenges.jsx'
 import { isOn } from '../lib/modules.js'
+import { manualCardioSheet } from '../components/ManualCardio.jsx'
+import { equipmentProfileSheet } from '../sheets.jsx'
+import { homeGymSetupSheet } from '../components/HomeGymSetup.jsx'
+import { HomeGymCircuitButton } from '../components/HomeGymCircuits.jsx'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -129,6 +133,17 @@ export default function Home() {
       <div><h1>{user ? t('Hi {0}', user.name) : 'openGym'}</h1><div className="sub">{today.toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
       <button className="iconbtn" data-tour="settings-gear" onClick={() => nav('/settings')} aria-label={trouble ? t('Settings') + ', ' + t('Connection problem') : t('Settings')}><Icon name="gear" />{trouble && <span className="tab-dot" aria-hidden="true" />}</button>
     </div>
+
+    <section className="card home-gym-actions" aria-label={t('Home gym')}>
+      <div className="row between"><h3>{t('Home gym')}</h3><Button size="sm" variant="ghost" onClick={() => {
+        const profile = (S.equipProfiles || []).find(p => p.id === S.activeEquipId)
+        if (profile) equipmentProfileSheet(profile)
+        else homeGymSetupSheet()
+      }}>{t('My equipment')}</Button></div>
+      <p className="small dim">{t('Your strength sessions, walks, and runs in one place.')}</p>
+      <Button variant="tinted" icon="plus" onClick={manualCardioSheet}>{t('Log a walk or run')}</Button>
+      <div style={{ marginTop: 8 }}><HomeGymCircuitButton onSaved={id => nav('/plan/r/' + id)} /></div>
+    </section>
 
     <div className="card">
       {/* A running programme (lib/programmes.js) wrote this week's plan: where it stands, one tap from its screen. */}
