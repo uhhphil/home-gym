@@ -1183,6 +1183,8 @@ export default function Settings({ page = null, find = null, via = null, entryKe
         {/* Attribution the media licence asks for word for word (agreement §8c), so it is not translated */}
         Exercise media © Aliaksandr Makatserchyk, <a href="https://gymvisual.com/" target="_blank" rel="noopener">Gym visual</a>, gymvisual.com.
         Media licensed for use in openGym only; see <a href="https://github.com/DuarteSantos8/openGym/blob/main/NOTICE.md" target="_blank" rel="noopener">NOTICE.md</a>
+        <br />Design adapted from <a href="https://www.figma.com/community/file/1356281690251535631" target="_blank" rel="noopener">FitBody by Vectorfair</a> under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.
+        {' '}Poppins and League Spartan fonts: <a href="https://github.com/uhhphil/home-gym/blob/main/docs/home-gym/FIGMA_UI.md" target="_blank" rel="noopener">credits and licenses</a>.
       </div>
     </>,
 

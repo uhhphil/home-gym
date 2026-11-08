@@ -9,7 +9,9 @@ import { startNativeKeyboard } from './lib/native-keyboard.js'
 // always had (before index.css), although their screens are now loaded on demand (App.jsx).
 import './admin.css'
 import './coach.css'
+import './fonts.css'
 import './index.css'
+import './home-gym-ui.css'
 import { hideBoot, handOverFromLaunchScreen } from './lib/boot.js'
 import { guardFocusZoom } from './lib/viewport-zoom.js'
 

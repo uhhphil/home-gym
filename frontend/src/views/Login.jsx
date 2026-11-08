@@ -12,6 +12,7 @@ import { askAddDeviceData } from '../sheets.jsx'
 import { passwordOn, PasswordRegisterForm, openPasswordSignIn } from '../components/PasswordAuth.jsx'
 import { openDeviceLinkRedeem } from '../components/Passkeys.jsx'
 import { openLostAccess } from '../components/LostAccess.jsx'
+import './Login.css'
 
 function RegisterSheet({ close }) {
   const { setUser, pushState, pullState, loadConfig } = useStore()
@@ -76,59 +77,74 @@ export default function Login() {
     try { const u = await passkeyLogin(); setUser(u, { adopt: true }); await adoptProfile(askAddDeviceData); useUI.getState().toast(t('Welcome back, {0}', u.name)) }
     catch (e) { if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') useUI.getState().toast(passkeyError(e, t('Sign-in failed'))) }
   }
-  const head = <>
-    <div style={{ fontSize: 54, display: 'flex', justifyContent: 'center', color: 'var(--acc-ink)' }}><Icon name="dumbbell" /></div>
-    <h1 className="t-large" style={{ fontWeight: 700, margin: '10px 0 4px' }}>openGym</h1>
-  </>
-  const wrap = { display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '78vh', textAlign: 'center' }
+  const head = <header className="gym-login-header">
+    <h1 className="gym-login-title">{t('Log In')}</h1>
+    <div className="gym-login-welcome">
+      <span className="gym-login-brand">HOME GYM</span>
+      <h2>{t('Welcome')}</h2>
+      <p>{t('Your workouts. Your weights. Your profile.')}</p>
+    </div>
+  </header>
 
   // Demo build: no backend to sign in against — the only way in is the local guest profile.
   if (DEMO) return (
-    <div className="narrow" style={wrap}>
+    <div className="gym-login gym-login-demo">
       {head}
-      <div className="muted" style={{ marginBottom: 30 }}>{t('Live demo. Everything stays in this browser.')}</div>
-      <Button variant="primary" icon="play" onClick={() => setGuest(true)}>{t('Start the demo')}</Button>
-      <div className="card small muted" style={{ textAlign: 'start', marginTop: 16 }}>
-        {t('This demo runs entirely in your browser on example data. Nothing is sent anywhere. Passkey sign-in and sync across your devices come with the openGym server, which you get by self-hosting it.')}
+      <div className="gym-login-band">
+        <div className="gym-login-controls">
+          <div className="gym-login-symbol" aria-hidden="true"><Icon name="dumbbell" /></div>
+          <p className="gym-login-description">{t('Live demo. Everything stays in this browser.')}</p>
+          <Button variant="primary" className="gym-login-signin" icon="play" onClick={() => setGuest(true)}>{t('Start the demo')}</Button>
+        </div>
       </div>
-      <div className="dim small" style={{ marginTop: 22, lineHeight: 1.6 }}>
+      <div className="gym-login-footer">
+        <p>{t('This demo runs entirely in your browser on example data. Nothing is sent anywhere. Passkey sign-in and sync across your devices come with the openGym server, which you get by self-hosting it.')}</p>
         <a href={REPO} target="_blank" rel="noopener">{t('Self-host it in a minute →')}</a>
       </div>
     </div>
   )
 
   return (
-    <div className="narrow" style={wrap}>
+    <div className="gym-login">
       {head}
-      <div className="muted" style={{ marginBottom: 34 }}>{t('Your workouts. Your weights. Your profile.')}</div>
       {webauthnOK() ? <>
-        <Button variant="primary" icon="fingerprint" onClick={signIn}>{t('Sign in with passkey')}</Button>
-        <div style={{ height: 10 }} />
-        {pwOn && <><Button icon="key" onClick={() => openPasswordSignIn()}>{t('Sign in with password')}</Button><div style={{ height: 10 }} /></>}
-        <Button icon="plusCircle" onClick={register}>{t('Create new profile')}</Button>
+        <div className="gym-login-band">
+          <div className="gym-login-controls">
+            <div className="gym-login-symbol" aria-hidden="true"><Icon name="fingerprint" /></div>
+            <p className="gym-login-description">{t('Your personal gym, one tap away.')}</p>
+            <Button variant="primary" className="gym-login-signin" icon="fingerprint" onClick={signIn}>{t('Sign in with passkey')}</Button>
+            {pwOn && <Button className="gym-login-signin" icon="key" onClick={() => openPasswordSignIn()}>{t('Sign in with password')}</Button>}
+          </div>
+        </div>
+        <div className="gym-login-actions">
+        <Button className="gym-login-create" onClick={register}>{t('Create new profile')}</Button>
         {/* Already signed in on another device: a code from there gives this one a passkey of
             its own (#95), instead of a new, empty profile. */}
-        <div style={{ height: 10 }} />
-        <Button variant="ghost" className="dim" icon="qr" onClick={openDeviceLinkRedeem}>{t('Use a code from your other device')}</Button>
+        <Button variant="ghost" className="gym-login-link" icon="qr" onClick={openDeviceLinkRedeem}>{t('Use a code from your other device')}</Button>
         {/* No device signs you in any more (#584): what to try, and where a recovery code goes. */}
-        <Button variant="ghost" className="dim" onClick={openLostAccess}>{t('Lost access?')}</Button>
-        {canGuest && <div style={{ height: 4 }} />}
+        <Button variant="ghost" className="gym-login-link" onClick={openLostAccess}>{t('Lost access?')}</Button>
+        </div>
       </> : pwOn ? <>
         {/* Plain http on a LAN address, or a browser without passkey support: the password is
             the way in, and the only way to create a profile from here. */}
-        <div className="card small muted" style={{ textAlign: 'start', marginBottom: 14 }}>{t("This browser doesn't support passkeys. Sign in with your name and password instead.")}</div>
-        <Button variant="primary" icon="key" onClick={() => openPasswordSignIn()}>{t('Sign in with password')}</Button>
-        <div style={{ height: 10 }} />
-        <Button icon="plusCircle" onClick={register}>{t('Create new profile')}</Button>
-        <Button variant="ghost" className="dim" onClick={openLostAccess}>{t('Lost access?')}</Button>
-        {canGuest && <div style={{ height: 10 }} />}
-      </> : <div className="card small muted" style={{ textAlign: 'start' }}>{canGuest
-        ? t("This browser doesn't do passkeys, but you can still use openGym locally on this device.")
-        // Without passkeys and without the guest entrance there is no way in from this browser,
-        // so say that plainly instead of offering a local profile that cannot be created.
-        : t("This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.")}</div>}
-      {canGuest && <Button variant="ghost" className="dim" onClick={() => setGuest(true)}>{t('Continue without account')}</Button>}
-      <div className="dim small" style={{ marginTop: 26, lineHeight: 1.5 }}>{pwOn ? t('Passkeys use {0}. A password works too, where passkeys do not.', bio()) : t('Passkeys use {0}. No passwords to remember.', bio())}<br />{t('Each profile keeps its own plan, workouts & body weight.')}</div>
+        <div className="gym-login-band">
+          <div className="gym-login-controls">
+            <div className="gym-login-symbol" aria-hidden="true"><Icon name="key" /></div>
+            <p className="gym-login-description">{t("This browser doesn't support passkeys. Sign in with your name and password instead.")}</p>
+            <Button variant="primary" className="gym-login-signin" icon="key" onClick={() => openPasswordSignIn()}>{t('Sign in with password')}</Button>
+          </div>
+        </div>
+        <div className="gym-login-actions">
+          <Button className="gym-login-create" onClick={register}>{t('Create new profile')}</Button>
+          <Button variant="ghost" className="gym-login-link" onClick={openLostAccess}>{t('Lost access?')}</Button>
+        </div>
+      </> : <div className="gym-login-band"><div className="gym-login-controls"><p className="gym-login-description">{canGuest
+          ? t("This browser doesn't do passkeys, but you can still use openGym locally on this device.")
+          // Without passkeys and without the guest entrance there is no way in from this browser,
+          // so say that plainly instead of offering a local profile that cannot be created.
+          : t("This browser doesn't support passkeys, and this instance requires an account. Try a browser or device with passkey support.")}</p></div></div>}
+      {canGuest && <div className="gym-login-guest"><Button variant="ghost" className="gym-login-link" onClick={() => setGuest(true)}>{t('Continue without account')}</Button></div>}
+      <div className="gym-login-footer"><p>{pwOn ? t('Passkeys use {0}. A password works too, where passkeys do not.', bio()) : t('Passkeys use {0}. No passwords to remember.', bio())}</p><p>{t('Each profile keeps its own plan, workouts & body weight.')}</p></div>
     </div>
   )
 }

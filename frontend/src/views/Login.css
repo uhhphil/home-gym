@@ -1,0 +1,198 @@
+/* Adapted from the supplied Vectorfair fitness kit: charcoal, lime headings and a
+   lavender sign-in band. Real authentication controls retain the app's own flow. */
+.gym-login {
+  --gym-login-bg: #232323;
+  --gym-login-lime: #e2f163;
+  --gym-login-purple: #b3a0ff;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - var(--sat, 0px) - var(--conn, 0px) - 48px);
+  margin-inline: calc(-1 * var(--pad, 20px));
+  background: var(--gym-login-bg);
+  color: #fff;
+  text-align: center;
+  font-family: 'League Spartan', sans-serif;
+}
+
+.gym-login-header {
+  padding: 18px 28px 0;
+}
+
+.gym-login .gym-login-title {
+  margin: 0;
+  color: var(--gym-login-lime);
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.gym-login-welcome {
+  padding: clamp(40px, 8svh, 76px) 0 44px;
+}
+
+.gym-login-brand {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: .2em;
+  color: var(--gym-login-lime);
+}
+
+.gym-login-welcome h2 {
+  margin: 0 0 22px;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.gym-login-welcome p {
+  max-width: 300px;
+  margin: 0 auto;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.gym-login-band {
+  width: 100%;
+  padding: 28px max(28px, var(--pad, 20px));
+  background: var(--gym-login-purple);
+  color: var(--gym-login-bg);
+}
+
+.gym-login-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.gym-login-symbol {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: #fff;
+  color: var(--gym-login-bg);
+  font-size: 29px;
+}
+
+.gym-login .gym-login-description {
+  margin: 0 0 4px;
+  color: var(--gym-login-bg);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.gym-login .btn.gym-login-signin {
+  min-height: 48px;
+  border: 1px solid #fff;
+  border-radius: 15px;
+  padding: 13px 18px;
+  background: #fff;
+  color: var(--gym-login-bg);
+  font-family: 'League Spartan', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.gym-login-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 32px 24px 0;
+}
+
+.gym-login .btn.gym-login-create {
+  width: auto;
+  min-width: 196px;
+  max-width: 100%;
+  min-height: 46px;
+  margin-bottom: 18px;
+  padding: 11px 24px;
+  border: 1px solid rgba(255, 255, 255, .85);
+  border-radius: 100px;
+  background: rgba(255, 255, 255, .09);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.gym-login .btn.gym-login-link {
+  width: auto;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: transparent;
+  color: var(--gym-login-lime);
+  font-family: 'League Spartan', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.gym-login-guest {
+  display: flex;
+  justify-content: center;
+  padding: 4px 24px 0;
+}
+
+.gym-login-footer {
+  max-width: 380px;
+  margin: auto auto 0;
+  padding: 24px 28px 12px;
+  color: rgba(255, 255, 255, .78);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.gym-login-footer p {
+  margin: 0 0 6px;
+}
+
+.gym-login-footer a {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--gym-login-lime);
+}
+
+.gym-login .btn:focus-visible,
+.gym-login a:focus-visible {
+  outline: 3px solid var(--gym-login-lime);
+  outline-offset: 4px;
+}
+
+.gym-login-band .btn:focus-visible {
+  outline-color: var(--gym-login-bg);
+}
+
+@media (min-width: 700px) {
+  .gym-login {
+    max-width: 640px;
+    margin-inline: auto;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+}
+
+@media (max-height: 720px) {
+  .gym-login-welcome { padding-block: 28px; }
+  .gym-login-welcome h2 { margin-bottom: 12px; }
+  .gym-login-actions { padding-top: 24px; }
+}

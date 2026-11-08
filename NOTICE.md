@@ -7,6 +7,12 @@ openGym's own code is licensed under the **GNU AGPL v3.0** (see [LICENSE](LICENS
 
 Modified 2026-11-08 in [uhhphil/home-gym](https://github.com/uhhphil/home-gym): home equipment setup, manual walking/running entry, timed circuit creation, dataset reconciliation tooling, and Railway deployment compatibility. Original attribution and licenses remain intact. These changes use openGym's architecture and existing license; no Skulpt code or third-party exercise photos were copied. The source and media reviews are in [docs/home-gym/COMPARISON.md](docs/home-gym/COMPARISON.md).
 
+## Personal home-gym interface adaptation
+
+The interface adapts the FitBody **Fitness App UI Kit for Gym Workout App Fitness Tracker Mobile App Gym Fitness Mobile App UI Kit** by **Vectorfair**, published at [Figma Community](https://www.figma.com/community/file/1356281690251535631) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Modified on 2026-11-08 for this personal openGym fork's visual design and existing home-gym workflows. Four original vector icons (workout, progress, search and profile) are included in `frontend/src/assets/fitbody/` under the same design license. No endorsement is implied. No stock photographs from the kit are imported; existing exercise media keeps its separate license below.
+
+Locally bundled **Poppins** (copyright 2020 The Poppins Project Authors) and **League Spartan** (copyright 2020 The League Spartan Project Authors) use the **SIL Open Font License 1.1**. Their full notices are included in [Poppins-OFL.txt](frontend/public/fonts/Poppins-OFL.txt) and [League-Spartan-OFL.txt](frontend/public/fonts/League-Spartan-OFL.txt), and remain with the font files in the built application. See [design and font provenance](docs/home-gym/FIGMA_UI.md) for sources and the modification record.
+
 ## App store exception
 
 As an additional permission under section 7 of the AGPL v3.0, the copyright holder permits

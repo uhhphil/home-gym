@@ -195,6 +195,28 @@ describe('service worker offline cold-launch (issue #274)', () => {
     expect(asked).toBe(0)
   })
 
+  it.each(['', '/gym'])('a cached local font under "%s" is available immediately with a dead radio', async prefix => {
+    let asked = 0
+    const { listeners, cache } = loadServiceWorker({ fetchImpl: () => { asked++; return deadRadio() } })
+    const url = `https://gym.example${prefix}/assets/poppins-latin-Abcd1234.woff2`
+    await cache.put(url, new Response('cached font', { headers: { 'content-type': 'font/woff2' } }))
+    const e = makeFetchEvent(url, 'cors')
+    listeners.fetch(e)
+    expect(await (await e.response).text()).toBe('cached font')
+    expect(asked).toBe(0)
+  })
+
+  it.each(['', '/gym'])('a cached UI icon under "%s" is available immediately with a dead radio', async prefix => {
+    let asked = 0
+    const { listeners, cache } = loadServiceWorker({ fetchImpl: () => { asked++; return deadRadio() } })
+    const url = `https://gym.example${prefix}/assets/progress-Abcd1234.svg`
+    await cache.put(url, new Response('<svg/>', { headers: { 'content-type': 'image/svg+xml' } }))
+    const e = makeFetchEvent(url, 'cors')
+    listeners.fetch(e)
+    expect(await (await e.response).text()).toBe('<svg/>')
+    expect(asked).toBe(0)
+  })
+
   it('a hashed chunk not cached yet comes from the network and is kept, a redirected answer is not', async () => {
     const answers = [new Response('export default 1'), Object.assign(new Response('<html>login</html>'), {})]
     Object.defineProperty(answers[1], 'redirected', { value: true })

@@ -5,6 +5,8 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { Window } from 'happy-dom'
+import { THEMES, applyAccent } from './lib/accent.js'
 
 const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
 const rule = sel => {
@@ -42,12 +44,61 @@ describe('design review 1.4.5: text inks', () => {
   })
 })
 
+describe('Figma fitness skin contrast', () => {
+  it('keeps accent icon ink through size and tint styles while preserving category colors', () => {
+    const window = new Window()
+    try {
+      const doc = window.document
+      doc.head.innerHTML = `<style>${css}</style>`
+      const icon = style => {
+        const el = doc.createElement('span')
+        el.className = 'lrow-i'
+        if (style) el.setAttribute('style', style)
+        doc.body.append(el)
+        return window.getComputedStyle(el).color
+      }
+      for (const theme of ['dark', 'light']) for (const accent of ['lime', 'sky', '#123456', '#ffff88']) {
+        doc.body.replaceChildren()
+        doc.documentElement.dataset.theme = theme
+        applyAccent(doc.documentElement, accent, theme)
+        const ink = window.getComputedStyle(doc.documentElement).getPropertyValue('--on-acc').trim()
+        // StartDoor and WorkoutRow resize their glyph without choosing another color.
+        expect(icon('width:38px;height:38px'), theme + ' ' + accent).toBe(ink)
+        expect(icon('background:var(--acc)')).toBe(ink)
+        expect(icon('--tint:var(--acc)')).toBe(ink)
+        expect(icon('--tint:var(--purple)')).toBe('#fff')
+        expect(icon('background:var(--orange)')).toBe('#fff')
+        expect(icon('background:var(--surface-3);color:#62577b')).toBe('#62577b')
+      }
+    } finally { window.happyDOM.abort() }
+  })
+  it('keeps custom-accent calculations aligned with the actual page and card surfaces', () => {
+    expect(THEMES.dark.bgs).toEqual([token(dark, '--bg'), token(dark, '--surface')])
+    expect(THEMES.light.bgs).toEqual([token(light, '--bg'), token(light, '--surface')])
+  })
+  it('keeps lavender navigation labels, white glyphs and the selected marker readable', () => {
+    expect(ratio(hex(token(dark, '--nav-ink')), hex(token(dark, '--lavender')))).toBeGreaterThanOrEqual(4.5)
+    expect(ratio(hex('#ffffff'), hex(token(dark, '--violet')))).toBeGreaterThanOrEqual(3)
+    expect(ratio(hex(token(dark, '--brand-ink')), hex(token(dark, '--lime')))).toBeGreaterThanOrEqual(4.5)
+    expect(rule('#tabbar .tab-ic')).toMatch(/background:var\(--nav-icon-bg\)/)
+  })
+  it('keeps every dark preset text ink readable on the raised charcoal card', () => {
+    const presetColors = { lime: '--lime', sky: '--blue', orange: '--orange', violet: '--purple', pink: '--pink', red: '--red', teal: '--teal', gold: '--yellow' }
+    for (const [name, color] of Object.entries(presetColors)) {
+      const own = token(rule(`:root:not([data-theme="light"])[data-accent="${name}"]`), '--acc-ink')
+      const ink = own || token(dark, color)
+      for (const g of grounds(dark)) expect(on(ink, g), name).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+})
+
 // The shared rules the review fixed, each one a bug that showed on several screens.
 describe('design review 1.4.5: shared rules', () => {
-  it('raises the chosen segment in the dark theme (lighter than its track)', () => {
+  it('gives the chosen segment the primary action fill and matching text ink', () => {
     const track = rule(':root:not([data-theme="light"]) .seg'), thumb = rule(':root:not([data-theme="light"]) .seg-sel')
-    expect(track).toMatch(/background:rgba\(118,118,128,\.24\)/)
-    expect(thumb).toMatch(/background:#636366/)
+    expect(track).toMatch(/background:var\(--surface-2\)/)
+    expect(thumb).toMatch(/background:var\(--acc\)/)
+    expect(rule('.seg button.on')).toMatch(/color:var\(--on-acc\)/)
   })
   it('styles a subtitle and the small line over a title wherever they sit', () => {
     expect(rule('.ss')).toMatch(/color:var\(--label-2\)/)
