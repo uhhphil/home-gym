@@ -2,9 +2,11 @@
 
 Run date: 2026-11-08. Main baseline commit: `58ae4691775b03e19d043babebfc3ac26c70aea6`. Local runtime: Node 24.21.0, npm 11.19.0. Existing CI/container runtime remains Node 22; this work does not upgrade dependencies or lockfiles.
 
+The initial implementation was merged through [PR #1](https://github.com/uhhphil/home-gym/pull/1) as `a503d0b7da4817864ffbdc7b4f59eaaee5c756b1` after green CI. Both approved Railway deployments of that commit succeeded. This document separates completed local/CI and live transport validation from the authentication, physical-device, and restoration checks that remain pending.
+
 ## Local app
 
-The API and Vite frontend were started successfully with isolated development data at `/private/tmp/home-gym-dev-data`. The local preview is http://127.0.0.1:5173. Local guest access is enabled only for this development process; production access settings were not changed.
+The API and Vite frontend were started successfully with isolated development data at `/private/tmp/home-gym-dev-data`. The local preview is http://127.0.0.1:5173. Local guest access is enabled only for this development process; production guest access remains disabled. During deployment follow-up, the intended `FIRST_USER_ADMIN=0` Railway setting was explicitly saved for the next deployment because existing variable values are redacted by the connector.
 
 To reproduce from the repository root, install locked dependencies:
 
@@ -41,6 +43,8 @@ The shell environment may require permission to download packages and bind local
 - Workflow YAML parses; the existing API CI job now also runs reconciliation tests and triggers on web deployment changes.
 - `git diff --check` passed.
 
+The [full Tests workflow](https://github.com/uhhphil/home-gym/actions/runs/42518210121) succeeded, including the full frontend suite and actual container image build/smoke checks. The [iOS workflow](https://github.com/uhhphil/home-gym/actions/runs/42518210131) passed its gate, but native jobs were skipped; the green workflow is not evidence of an iOS/watchOS build or a physical-device test.
+
 Representative commands:
 
 ```sh
@@ -68,6 +72,8 @@ Only the isolated browser guest profile contains QA samples. No production worko
 
 ## Production and device limits
 
-The live Railway URL shows **404 Not Found**. The connected Railway API reports both services offline after failed deployments. Source repairs are prepared; production has not been changed. See [deployment-and-integrations.md](deployment-and-integrations.md) for exact failures and required port settings.
+At the initial read-only audit, the live Railway URL showed **404 Not Found** and the connected Railway API reported both services offline after failed deployments. Since then, source repairs were merged and the approved web settings `PORT=8080`, `NGINX_PORT=8080`, and `BACKEND_PORT=3000` were applied. Both services reached **SUCCESS** at merged commit `a503d0b7da4817864ffbdc7b4f59eaaee5c756b1`, verified around 3:21 p.m. Eastern on 2026-11-08 (20:20:51 UTC): API deployment `b8b89560-16ae-4f4a-a025-936b0604f507`, web deployment `06e45eaa-77d6-438a-842f-1f58b0468b1d`.
 
-Container image rebuilds/deployed health checks, real-domain sign-in, real-phone airplane-mode/background/force-quit scenarios, Apple Health/Watch pairing, GPS, and off-volume backup/restore are **not verified**. Logical retry/merge tests and browser reload checks do not substitute for these acceptance checks.
+The [live app](https://home-gym-production-8981.up.railway.app) displays the openGym passkey login screen. Proxied `/api/health` returns `ok: true`, `users: 0`, `writable: true`; `/api/config` returns `allow_guest: false`, `invite_only: false`. Railway HTTP logs confirm root, health, and configuration responses (`200`) and static JavaScript/CSS responses (`200`/`304`), without upstream errors in the inspected requests. Both services are ONLINE with one running and zero crashed replicas each, no pending work, and zero current warning/critical counts. API startup logs confirm port 3000 and the production domain's correct passkey RP ID and HTTPS origin. No production accounts or workouts were manually added. See [deployment-and-integrations.md](deployment-and-integrations.md) for the historical failures and live evidence.
+
+Actual container images, deployment health, public transport, application shell, and storage writability are verified. The owner chose to set up the profile later: no account was created, guest access remains disabled, and registration stays open until the owner registers, is promoted, and invitation-only access is enabled. Owner phone passkey registration and login, exact-ID admin promotion, invitation-only lockdown, authenticated workout persistence, real-phone airplane-mode/background/force-quit scenarios, Apple Health/Watch pairing, GPS, and off-volume backup/restore are **not verified or not yet completed**. When ready, the owner must complete the phone's Face ID/passkey prompt. Logical retry/merge tests, a writable health probe, and browser reload checks do not substitute for these acceptance checks.
