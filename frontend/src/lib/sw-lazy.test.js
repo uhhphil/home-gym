@@ -55,7 +55,19 @@ describe('the worker keeps the on-demand code too', () => {
     expect(asked).toEqual(['index.html', './assets/index-new.js'])
   })
 
-  it('the build lists code and styles, not the language packs (but the English steps)', () => {
+  it('prefetches local fonts, without caching a redirected font or blocking a usable shell', async () => {
+    const sw = stampSw(source, { stamp: 'fonts', lazy: ['./assets/poppins-Abcd1234.woff2', './assets/league-Efgh5678.woff2'] })
+    const cache = await install(sw, async u => {
+      if (String(u) === 'index.html') return ok(shell)
+      if (String(u).includes('league-')) return { ok: true, status: 200, redirected: true }
+      return ok('font bytes')
+    })
+    expect([...cache.keys()]).toContain('./assets/poppins-Abcd1234.woff2')
+    expect([...cache.keys()]).not.toContain('./assets/league-Efgh5678.woff2')
+    expect([...cache.keys()]).toContain('index.html')
+  })
+
+  it('the build lists code, styles, local fonts and icons, not the language packs (but the English steps)', () => {
     const chunk = (...moduleIds) => ({ type: 'chunk', moduleIds })
     const bundle = {
       'assets/index-a.js': chunk('/app/frontend/src/main.jsx'),
@@ -64,13 +76,15 @@ describe('the worker keeps the on-demand code too', () => {
       'assets/de-d.js': chunk('/app/frontend/src/instr/de.js'),
       'assets/ru-e.js': chunk('/app/frontend/src/exercise-names/ru.js'),
       'assets/index-f.css': { type: 'asset' },
+      'assets/poppins-Abcd1234.woff2': { type: 'asset' },
+      'assets/progress-Abcd1234.svg': { type: 'asset' },
       'icon-512.png': { type: 'asset' },
       // the English steps and descriptions every language falls back to: offline as well
       'assets/en-g.js': chunk('/app/frontend/src/instr/en.js'),
       'assets/en-h.js': chunk('/app/frontend/src/exercise-desc/en.js'),
       'assets/de-i.js': chunk('/app/frontend/src/exercise-desc/de.js'),
     }
-    expect(lazyAssets(bundle)).toEqual(['./assets/de-i.js', './assets/en-g.js', './assets/en-h.js', './assets/index-a.js', './assets/index-f.css', './assets/media-ingest-b.js'])
+    expect(lazyAssets(bundle)).toEqual(['./assets/de-i.js', './assets/en-g.js', './assets/en-h.js', './assets/index-a.js', './assets/index-f.css', './assets/media-ingest-b.js', './assets/poppins-Abcd1234.woff2', './assets/progress-Abcd1234.svg'])
   })
 
   it('the build stamps the worker with both', () => {

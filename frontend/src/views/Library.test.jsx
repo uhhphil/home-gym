@@ -61,14 +61,16 @@ describe('Library favourites', () => {
   // The Library is the one page whose header puts a text button beside the title, so it leaves the
   // title the least room of anywhere in the app — 95px for Polish, 125px for Russian on a 320px
   // screen. The button must stay reachable (it is flex:none, the title block shrinks), but a title
-  // squeezed that far must not come apart: at 34px "Упражнения" broke into three lines, so the
-  // title drops a step on phone widths and breaks a word only as a last resort.
+  // squeezed that far must not come apart: at 34px "Упражнения" broke into three lines. The
+  // compact kit title stays under the old 30px phone ceiling and breaks words as a last resort.
   it('keeps the header button reachable without shredding the title', () => {
     expect(cssSource).toContain('.hdr>div{min-width:0}')
     expect(cssSource).toContain('.hdr>.btn{flex:none}')
-    // the page title is --fs-large, which drops from 34 to 30 px on phone widths (P1 type scale)
+    // Keep every declaration under that ceiling, including any future phone override.
     expect(cssSource).toMatch(/\.hdr h1\{font-size:var\(--fs-large\)/)
-    expect(cssSource).toMatch(/@media \(max-width:420px\)\{:root\{--fs-large:1\.875rem\}\}/)
+    const sizes = [...cssSource.matchAll(/--fs-large:\s*([\d.]+)rem/g)].map(m => Number(m[1]))
+    expect(sizes.length).toBeGreaterThan(0)
+    expect(Math.max(...sizes)).toBeLessThanOrEqual(1.875)
     const h1 = cssSource.match(/^\.hdr h1\{([^}]*)\}/m)
     expect(h1?.[1]).toContain('overflow-wrap:break-word')
     expect(h1[1]).not.toContain('overflow-wrap:anywhere')

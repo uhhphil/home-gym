@@ -1,0 +1,96 @@
+/* Page composition adapted from Vectorfair's FitBody kit (CC BY 4.0).
+   See docs/home-gym/FIGMA_UI.md. Workout content stays in openGym's model. */
+.home-gym-screen,.gym-plan,.gym-history {
+  --gym-panel:#b3a0ff;
+  --gym-panel-ink:#232323;
+  --gym-card:#fff;
+  --gym-card-ink:#232323;
+  --gym-card-secondary:#62577b;
+  --gym-card-purple:#6840c8;
+}
+.gym-kit-icon { display:block; flex:none; max-width:none; }
+.home-gym-screen>.hdr { margin-top:20px; margin-bottom:20px; align-items:center; }
+.home-gym-screen>.hdr h1 { color:var(--brand-lavender); }
+.home-gym-screen>.hdr .sub { font-size:var(--fs-footnote); }
+.home-gym-screen .hdr-actions { gap:0; }
+.home-gym-screen .hdr-actions .iconbtn { width:44px; height:44px; }
+.home-gym-screen .hdr-actions .iconbtn::before { inset:0; }
+.gym-quick-links { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin:0 0 22px; }
+.gym-quick-links>button {
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+  min-width:0; min-height:76px; padding:8px 5px; border:0; background:none;
+  color:var(--brand-lavender); font-size:var(--fs-caption); line-height:1.15; cursor:pointer;
+  position:relative; border-radius:12px;
+}
+.gym-quick-links>button+button::before { content:''; position:absolute; inset-inline-start:0; top:12px; bottom:12px; width:1px; background:var(--brand-lavender); opacity:.45; }
+.gym-quick-links>button>.icn { width:32px; height:32px; font-size:32px; }
+.gym-quick-links>button:first-child { color:var(--acc-ink); }
+.gym-quick-links>button:active { background:var(--surface-2); }
+.gym-section-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.gym-section-heading h2 { font-family:var(--font-heading); font-size:var(--fs-body); font-weight:500; color:var(--acc-ink); line-height:1.35; }
+.gym-section-heading>.btn { width:auto; color:var(--label); font-size:var(--fs-caption); }
+.gym-routine-section { margin-bottom:24px; }
+.gym-routine-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.gym-routine-tile { position:relative; display:flex; flex-direction:column; min-width:0; padding:0; border:1px solid var(--label-2); border-radius:20px; background:var(--bg); color:var(--label); text-align:start; overflow:hidden; cursor:pointer; }
+.gym-routine-media { display:grid; place-items:center; flex:none; min-width:0; height:110px; background:#fff; color:#6840c8; overflow:hidden; }
+.gym-routine-media>.thumb { width:100%; height:100%; max-height:180px; object-fit:contain; border-radius:0; background:#fff; }
+.gym-routine-media>.thumb-x { color:#6840c8; }
+.gym-routine-media>.icn,.gym-routine-media>.thumb-x>.icn { width:40px; height:40px; font-size:40px; }
+.gym-routine-caption { padding:11px 10px 12px; display:flex; flex-direction:column; gap:6px; min-height:72px; }
+.gym-routine-caption>strong { font-family:var(--font-heading); font-size:var(--fs-footnote); font-weight:500; line-height:1.4; color:var(--acc-ink); overflow-wrap:anywhere; padding-inline-end:12px; }
+.gym-routine-caption>span { display:flex; align-items:center; gap:5px; font-size:var(--fs-caption); color:var(--label-2); }
+.gym-routine-open { position:absolute; top:94px; inset-inline-end:8px; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--brand-purple); color:#fff; }
+.gym-routine-tile:active { transform:scale(var(--press-scale-card)); }
+.gym-routine-empty { border:1px solid var(--sep); border-radius:20px; padding:24px 20px 14px; background:var(--surface); }
+.gym-routine-empty h3 { font-family:var(--font-heading); font-size:var(--fs-title3); line-height:1.35; font-weight:600; margin-bottom:10px; }
+.gym-routine-empty p { font-size:var(--fs-callout); color:var(--label-2); margin-bottom:22px; }
+.gym-routine-empty>.btn { margin-top:6px; }
+.gym-week-band { margin:0 calc(-1 * var(--pad)) 26px; padding:24px var(--pad); background:var(--gym-panel); }
+.gym-week-band>.gym-week-card { margin:0; padding:18px 14px 10px; border:0; border-radius:22px; background:var(--bg); }
+.gym-week-card .wday.today { border-radius:20px; }
+.gym-week-card .today-row { margin-top:14px; padding:14px 10px; }
+.gym-log-section { margin-bottom:26px; }
+.gym-log-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.gym-log-card { min-width:0; display:flex; flex-direction:column; padding:16px 12px 12px; border-radius:20px; background:var(--gym-card); color:var(--gym-card-ink); }
+.gym-log-glyph { display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--brand-purple); color:white; font-size:23px; margin-bottom:12px; }
+.gym-log-card h3 { font-family:var(--font-heading); font-size:var(--fs-footnote); font-weight:600; line-height:1.4; margin-bottom:6px; }
+.gym-log-card p { color:var(--gym-card-secondary); font-size:var(--fs-footnote); line-height:1.25; margin-bottom:16px; }
+.gym-log-card>.btn { margin-top:auto; min-height:44px; font-size:var(--fs-caption); line-height:1.25; padding:8px; border-radius:100px; background:#e2f163; color:#232323; gap:4px; }
+.gym-log-card>.btn:active { background:#d2e151; }
+.gym-log-card :focus-visible,.gym-history-summary :focus-visible,.gym-plan .routine-list .plan-routine :focus-visible { outline-color:#232323; }
+.gym-history-summary { display:grid; grid-template-columns:1fr 1fr auto; align-items:center; gap:12px; padding:24px var(--pad); margin:0 calc(-1 * var(--pad)) 24px; background:var(--gym-panel); color:var(--gym-panel-ink); }
+.gym-history-summary>div { display:flex; flex-direction:column; gap:10px; min-width:0; }
+.gym-history-summary>div+div { border-inline-start:1px solid #6c569e; padding-inline-start:16px; }
+.gym-history-summary span { font-size:var(--fs-footnote); }
+.gym-history-summary strong { font-family:var(--font-heading); font-size:1.75rem; line-height:1; font-weight:600; }
+.gym-history-summary>.btn { color:#232323; font-size:var(--fs-caption); }
+.gym-progress-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin:0 0 24px; }
+.gym-progress-tabs>button { min-height:44px; border:0; border-radius:100px; padding:8px; background:white; color:#6840c8; font-size:var(--fs-callout); cursor:pointer; }
+.gym-progress-tabs>button.on { background:#e2f163; color:#232323; }
+.gym-history-list,.gym-plan .routine-list { display:flex; flex-direction:column; gap:14px; background:none; border:0; overflow:visible; }
+.gym-history-list>.item,.gym-plan .routine-list .plan-routine { padding:16px 12px; border:0; min-height:88px; border-radius:20px; background:var(--gym-card); color:var(--gym-card-ink); }
+.gym-history-list>.item::after,.gym-plan .routine-list .plan-routine::after { display:none; }
+.gym-history-list .ss,.gym-plan .routine-list .ss { color:var(--gym-card-secondary); font-size:var(--fs-footnote); }
+.gym-history-list .wrow-media { color:var(--gym-card-secondary); }
+.gym-history-list .tt,.gym-plan .routine-list .tt { font-family:var(--font-heading); font-weight:500; font-size:var(--fs-callout); line-height:1.3; }
+.gym-history-list .lrow-i,.gym-plan .routine-list .lrow-i { background:#896cfe; color:white; border-radius:50%; }
+.gym-history-list .chev,.gym-plan .routine-list .chev { color:#6840c8; }
+.gym-history-list .pr { color:#654000; }
+.gym-plan .routine-list .gym-routine-media { width:88px; height:88px; border-radius:14px; margin:-8px 0; }
+.gym-plan .routine-list .plan-routine>.lrow-i:has(+.grow) { display:none; }
+.gym-plan .routine-list.is-editing .plan-routine>.lrow-i { display:grid; }
+.gym-plan .routine-list.is-editing .plan-minus { background:#a72020; color:#fff; }
+.gym-plan .routine-list.is-editing .plan-handle { color:#62577b; }
+.gym-plan .routine-list .swrow-item { border-radius:20px; }
+.gym-plan .plan-views { margin-bottom:24px; }
+.stats-sect>.card>.chart { border-radius:20px; }
+:root[data-theme="light"] .home-gym-screen>.hdr h1 { color:#6840c8; }
+:root[data-theme="light"] .gym-quick-links>button { color:#6840c8; }
+:root[data-theme="light"] .gym-quick-links>button>.gym-kit-icon { background:#232323; border-radius:6px; box-shadow:0 0 0 4px #232323; }
+@media (min-width:560px) { .gym-week-band,.gym-history-summary { margin-inline:0; border-radius:24px; } }
+@media (max-width:360px) {
+  .gym-log-grid { grid-template-columns:1fr; }
+  .gym-history-summary { gap:8px; grid-template-columns:1fr 1fr; }
+  .gym-history-summary>.btn { grid-column:1/-1; justify-self:start; }
+}
+@media (prefers-reduced-motion:reduce) { .gym-routine-tile:active { transform:none; } }

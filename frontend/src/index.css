@@ -1,42 +1,33 @@
 /* ============================================================================
-   openGym — design system
+   Home Gym — shared design system, adapted from the supplied Figma fitness kit
    ----------------------------------------------------------------------------
-   Rebuilt around four rules, each aimed at a specific "generated" tell in the
-   previous sheet:
-
-   1. ONE TYPE SCALE, MOSTLY REGULAR WEIGHT. The old sheet set font-weight 700/800
-      on nearly every element, which flattens hierarchy — when everything shouts,
-      position is the only cue left. Here weight carries meaning: 600 for a title,
-      400 for its content, and size does the rest.
-   2. A NEUTRAL SURFACE RAMP. Cards are near-neutral greys a few points apart, not
-      saturated blue-greys. Colour is spent only on the accent and on status.
-   3. HAIRLINES, NOT BORDERS. Separators are sub-pixel and inset past the icon
-      rail, so a list reads as one object instead of a stack of outlined boxes.
-   4. MOTION THAT ACKNOWLEDGES, NOT ANIMATES. Presses scale ~2%, transitions run
-      140–220ms on an ease-out curve. Nothing bounces or slides for decoration.
+   Charcoal surfaces, lime actions and lavender navigation establish the kit's
+   visual language. Poppins carries headings; League Spartan carries controls
+   and body copy. The existing semantic tokens, focus states, touch targets and
+   safe-area rules remain shared by every screen and by the native shell.
    ========================================================================== */
 
 /* ---------------------------------------------------------------- tokens -- */
 :root {
   /* surfaces — dark is the default */
-  --bg:        #000000;
-  --bg-el:     #0e0e10;   /* elevated backdrop (sheets, bars) */
-  --surface:   #1c1c1e;   /* card / grouped-list fill */
-  --surface-2: #2c2c2e;   /* pressed + nested fill */
-  --surface-3: #3a3a3c;   /* controls (segmented track, switch off) */
+  --bg:        #232323;
+  --bg-el:     #29282c;   /* elevated backdrop (sheets, bars) */
+  --surface:   #2d2c30;   /* card / grouped-list fill */
+  --surface-2: #39373e;   /* pressed + nested fill */
+  --surface-3: #47434e;   /* controls (segmented track, switch off) */
   /* Things that float over the page (the tour bubble, a dialog, the rest timer, a chart's tooltip,
      the back-to-top button): one step lighter than a card and edged with a hairline of light, so
      in the dark theme they read as lifted rather than as one more card under a shadow you cannot
      see on black (redesign 1.4.5, P11). In the light theme white with the shadow does that. */
-  --surface-raised: #2c2c2e;
-  --raised-line: rgba(255,255,255,.09);
+  --surface-raised: #39373e;
+  --raised-line: rgba(179,160,255,.20);
 
   /* text */
   --label:     #ffffff;
   --label-2:   rgba(235,235,245,.60);
   --label-3:   rgba(235,235,245,.32);
   --label-4:   rgba(235,235,245,.18);
-  --label-dim: rgba(235,235,245,.50);
+  --label-dim: rgba(235,235,245,.57);
 
   /* lines */
   --sep:       rgba(84,84,88,.60);
@@ -48,9 +39,18 @@
   --yellow:#ffd60a; --teal:#40c8e0; --indigo:#5e5ce6; --pink:#ff375f;
   --purple:#bf5af2; --mint:#63e6e2; --brown:#ac8e68; --grey:#8e8e93;
 
+  /* The kit's three brand colours stay separate from status colours. A success
+     remains green; the primary action is lime. */
+  --lime:#e2f163; --violet:#896cfe; --lavender:#b3a0ff;
+  --brand-lime:var(--lime); --brand-purple:var(--violet); --brand-lavender:var(--lavender);
+  --brand-ink:#232323;
+  --nav-bg:var(--lavender); --nav-ink:#232323; --nav-icon-bg:var(--violet);
+  --font-body:'League Spartan',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+  --font-heading:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+
   /* accent (per-account, synced) */
-  --acc:  var(--green);
-  --acc-2:#248a3d;
+  --acc:  var(--lime);
+  --acc-2:#c5d244;
   --on-acc:#000000;
   --acc-soft: color-mix(in srgb, var(--acc) 16%, transparent);
   --acc-line: color-mix(in srgb, var(--acc) 38%, transparent);
@@ -61,8 +61,8 @@
   --acc-ink: var(--acc);
 
   /* geometry */
-  --r-sm:8px; --r:12px; --r-lg:16px; --r-xl:22px; --r-card:14px;
-  --pad:16px;
+  --r-sm:12px; --r:16px; --r-lg:20px; --r-xl:28px; --r-card:20px;
+  --pad:20px;
   --icon-stroke:1.7;
 
   /* type scale (redesign 1.4.5, P1): the iPhone's text styles, in rem so a browser's text size
@@ -70,17 +70,17 @@
      and the views is one of these; what stays in px is a glyph (an icon's size) or a display
      figure inside a fixed box (the timer, a tile's number). Size, leading and tracking move as a
      set: tighter as the type grows, a hair looser as it shrinks (APPLE §15). */
-  --fs-caption2:.6875rem;  /* 11: tab labels, badges */
-  --fs-caption:.75rem;     /* 12: meta, axis text, small labels */
-  --fs-footnote:.8125rem;  /* 13: subtitles, the small line over a title */
+  --fs-caption2:.75rem;    /* 12: tab labels, badges */
+  --fs-caption:.8125rem;   /* 13: meta, axis text, small labels */
+  --fs-footnote:.875rem;   /* 14: subtitles, the small line over a title */
   --fs-subhead:.9375rem;   /* 15: secondary lines, values */
   --fs-callout:1rem;       /* 16: titles in dense lists, inputs */
   --fs-body:1.0625rem;     /* 17: body and row titles */
   --fs-title3:1.25rem;     /* 20: card titles, an exercise name */
   --fs-title2:1.375rem;    /* 22: a lead line */
-  --fs-large:2.125rem;     /* 34: the page title (30 on a narrow phone, below) */
-  --lh-tight:1.06; --lh-title:1.2; --lh-body:1.29; --lh-small:1.38;
-  --ls-large:-.028em; --ls-title:-.021em; --ls-body:-.01em; --ls-small:-.004em;
+  --fs-large:1.25rem;      /* 20: Poppins page heading, as in the kit */
+  --lh-tight:1.2; --lh-title:1.3; --lh-body:1.35; --lh-small:1.4;
+  --ls-large:-.015em; --ls-title:-.01em; --ls-body:0; --ls-small:0;
 
   /* motion */
   --ease:cubic-bezier(.32,.72,0,1);
@@ -141,7 +141,7 @@
 }
 
 /* accents — Apple's system colours, so a recolour never looks off-system */
-:root[data-accent="lime"]  { --acc:var(--green);  --acc-2:#248a3d; --on-acc:#000 }
+:root[data-accent="lime"]  { --acc:var(--lime);   --acc-2:#c5d244; --on-acc:#000; --knob-ring:rgba(0,0,0,.28) }
 :root[data-accent="sky"]   { --acc:var(--blue);   --acc-2:#0060df; --on-acc:#fff }
 :root[data-accent="orange"]{ --acc:var(--orange); --acc-2:#c76b00; --on-acc:#000 }
 :root[data-accent="violet"]{ --acc:var(--purple); --acc-2:#8944ab; --on-acc:#fff }
@@ -149,10 +149,15 @@
 :root[data-accent="red"]   { --acc:var(--red);    --acc-2:#d70015; --on-acc:#fff }
 :root[data-accent="teal"]  { --acc:var(--teal);   --acc-2:#0071a4; --on-acc:#000 }
 :root[data-accent="gold"]  { --acc:var(--yellow); --acc-2:#b25000; --on-acc:#000; --knob-ring:rgba(0,0,0,.28) }
+/* These fills need lighter text inks on the kit's charcoal card surface. */
+:root:not([data-theme="light"])[data-accent="sky"]    { --acc-ink:#5ca9ff }
+:root:not([data-theme="light"])[data-accent="violet"] { --acc-ink:#d18af6 }
+:root:not([data-theme="light"])[data-accent="pink"]   { --acc-ink:#ff718b }
+:root:not([data-theme="light"])[data-accent="red"]    { --acc-ink:#ff756d }
 /* --acc-ink in the light theme, per preset: 4.5:1 or better on both --bg (#f2f2f7) and white. A
    colour of the user's own gets its --acc-ink inline from lib/accent.js (inkIn), to the same 4.5:1
    in both themes (redesign 1.4.5, P12). */
-:root[data-theme="light"][data-accent="lime"]  { --acc-ink:#1a7f37 }
+:root[data-theme="light"][data-accent="lime"]  { --acc-ink:#596400 }
 :root[data-theme="light"][data-accent="sky"]   { --acc-ink:#0062cc }
 :root[data-theme="light"][data-accent="orange"]{ --acc-ink:#a85200 }
 :root[data-theme="light"][data-accent="violet"]{ --acc-ink:#8944ab }
@@ -181,6 +186,7 @@
    takes black text there; the darker light-theme ones keep the inks chosen above. */
 @media (prefers-contrast: more){
   :root{
+    --lime:#f0ff88;
     --blue:#5cb8ff; --green:#4ad968; --red:#ff6165; --orange:#ffa056;
     --yellow:#fedf43; --teal:#3bddec; --indigo:#a7aaff; --pink:#ff8ac4;
     --purple:#ea8dff; --mint:#54dfcb; --brown:#dba679; --grey:#aeaeb2;
@@ -190,6 +196,7 @@
   }
   :root:not([data-theme="light"]){ --on-acc:#000 }
   :root[data-theme="light"]{
+    --lime:#e2f163;
     --blue:#1e6ef4; --green:#008932; --red:#e9152d; --orange:#c55300;
     --yellow:#a16a00; --teal:#008198; --indigo:#564ade; --pink:#e7124d;
     --purple:#b02fc2; --mint:#008575; --brown:#956d51; --grey:#6c6c70;
@@ -211,7 +218,7 @@ html{
 }
 body{
   background:var(--bg);color:var(--label);
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Segoe UI',Roboto,system-ui,sans-serif;
+  font-family:var(--font-body);
   font-size:var(--fs-body);line-height:var(--lh-body);letter-spacing:var(--ls-body);
   min-height:100vh;min-height:100dvh;overscroll-behavior-y:none;overflow-x:clip;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
@@ -232,6 +239,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;let
 input,select,textarea{font:inherit;color:var(--label);letter-spacing:inherit}
 img{max-width:100%}
 a{color:var(--acc-ink);text-decoration:none}
+h1,h2,h3,h4,h5,h6{font-family:var(--font-heading)}
 :focus{outline:none}
 :focus-visible{outline:2.5px solid var(--acc-ink);outline-offset:2px;border-radius:6px}
 button,.chip,.tile,.item,.wday,.cal-d,.swatch,.hm-c,.lrow,.seg button,.stp button,.sld
@@ -360,25 +368,14 @@ button.conn:active{filter:brightness(1.12)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .conn-bar{background:var(--bg)}
 }
-/* large title, the way a nav bar does it */
+/* Compact page heading from the kit. */
 .hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 0 18px}
-/* The title block gives way, the button on the right never does: a flex item will not shrink
-   below its longest word, so "Упражнения" at 34px or "Hi Bartholomew_Jones" used to push the
-   gear / "By muscle" past the screen edge. Two things follow from letting it shrink. Below 420px
-   — every phone width we test — the title drops a step to 30px, because the 95 to 125px the
-   Library button leaves the Polish and Russian titles is less than half of "Ćwiczenia" or
-   "Упражнения" at 34px and they came apart into three lines; at 30px all 14 packs take two at
-   most. And a word that still does not fit is broken with overflow-wrap:break-word, which moves
-   the whole word to the next line first and breaks it only if it does not fit there either —
-   `anywhere` broke "Bartholomew_Jones" mid-word even at 412px, where a line of its own was
-   waiting for it. hyphens:auto goes with them: the hyphen costs a character's worth of width in
-   a box this tight, and that is what turned "Упражнения" into "Упра / жнен / ия". */
+/* The title can wrap while trailing actions keep their tap targets. Long names
+   move whole words first, then break only when a word cannot fit the phone. */
 .hdr>div{min-width:0}
 .hdr>.btn{flex:none}
 .hdr>.hdr-actions{display:flex;align-items:center;gap:8px;flex:none}
-.hdr h1{font-size:var(--fs-large);line-height:var(--lh-tight);font-weight:700;letter-spacing:var(--ls-large);overflow-wrap:break-word}
-/* the page title drops a step on phone widths (the Library's header leaves it the least room) */
-@media (max-width:420px){:root{--fs-large:1.875rem}}
+.hdr h1{font-size:var(--fs-large);line-height:var(--lh-tight);font-weight:700;letter-spacing:var(--ls-large);overflow-wrap:break-word;color:var(--acc-ink)}
 .hdr .sub{color:var(--label-2);font-size:var(--fs-subhead);letter-spacing:-.006em;margin-top:4px}
 /* Library: the count line runs under the title row at full width instead of beside the "By muscle"
    button, which left it ~200px on a phone: the catalogue count plus your own exercises stays one
@@ -449,7 +446,7 @@ h4.sec{
 /* ----------------------------------------------------------------- card -- */
 .card{
   background:var(--surface);border-radius:var(--r-card);
-  padding:16px;margin-bottom:12px;
+  padding:18px;margin-bottom:16px;
 }
 .card .big{font-size:30px;font-weight:600;letter-spacing:-.026em;line-height:1.1}
 /* A whole card that opens something (check-in, the streak's calendar, the advent card) answers the
@@ -510,8 +507,12 @@ h4.sec{
 .lrow-i{
   width:29px;height:29px;border-radius:7px;flex:none;font-size:18px;
   display:flex;align-items:center;justify-content:center;
-  background:var(--tint,var(--acc));color:#fff;
+  background:var(--tint,var(--acc));color:var(--on-acc);
 }
+/* Size-only styles do not change the icon ink. An explicit category tint keeps
+   its inverse glyph; an accent tint uses the primary action's matching ink. */
+.lrow-i[style*="--tint"],.lrow-i[style*="background"]{color:#fff}
+.lrow-i[style*="var(--acc)"]{color:var(--on-acc)}
 /* The title column never shrinks below its own longest word. With a basis of 0 and min-width:0 it
    only got what a capped value left over, and on a 320px phone "Progression" (96px) was painted over
    by "Linear progression" in a 37px box; min-width:auto — the flex default — is exactly the floor
@@ -570,8 +571,8 @@ h4.sec{
 /* -------------------------------------------------------------- buttons -- */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;
-  padding:14px 18px;border-radius:var(--r);font-size:var(--fs-body);font-weight:600;
-  letter-spacing:-.012em;background:var(--surface-2);color:var(--label);
+  min-height:44px;padding:13px 20px;border-radius:24px;font-size:var(--fs-body);font-weight:600;
+  letter-spacing:0;background:var(--surface-2);color:var(--label);
   transition:transform var(--fast) var(--ease),background var(--fast),opacity var(--fast);
 }
 .btn .icn{font-size:19px}
@@ -587,61 +588,59 @@ h4.sec{
    but .btn.ghost outranked .dim, so they all came out in the accent, as loud as the action above
    them. Secondary grey, not the tertiary .dim: these are still words to read (design review 1.4.5). */
 .btn.ghost.dim,.btn.plain.dim{color:var(--label-2)}
-.btn.sm{padding:8px 14px;width:auto;font-size:var(--fs-subhead);border-radius:var(--r-sm);gap:5px}
+.btn.sm{padding:8px 14px;width:auto;font-size:var(--fs-subhead);border-radius:20px;gap:5px}
 .btn.sm .icn{font-size:var(--fs-callout)}
-.btn.xs{padding:5px 10px;width:auto;font-size:var(--fs-footnote);border-radius:7px;gap:4px}
+.btn.xs{padding:5px 10px;width:auto;font-size:var(--fs-footnote);border-radius:16px;gap:4px}
 .btn:disabled{opacity:.32;pointer-events:none}
 .weekly-volume-toggle{padding-block:0}
 .weekly-volume-toggle .icn{transition:transform var(--fast) var(--ease)}
 .weekly-volume-toggle[aria-expanded="true"] .icn{transform:rotate(180deg)}
 
 /* ----------------------------------------------------------- tab bar ----- */
-/* Nearly opaque, and deliberately so. At the old 72% the page read straight through the bar
-   and the labels had to compete with whatever was scrolling behind them — nobody needs to read
-   the content under a navigation bar. 94% keeps a hint of movement behind the glass without
-   letting text through. The blur is also down from 24px to 10px: this is a fixed element, so
-   the WebView recomposites the blurred region on every scroll frame, and on Android that is
-   the single most expensive thing on the screen. See @supports below for the no-blur case. */
+/* The kit's lavender navigation band, opaque so scrolling text never competes
+   with labels. White glyphs sit on purple wells for sufficient contrast. */
 #tabbar{
   position:fixed;inset-inline-start:0;inset-inline-end:0;bottom:0;z-index:50;
   display:flex;justify-content:space-around;align-items:flex-end;
-  padding:7px 6px calc(6px + var(--sab));
-  background:var(--bg-el);background:color-mix(in srgb,var(--bg-el) 94%,transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(10px);backdrop-filter:saturate(180%) blur(10px);
-  border-top:var(--hair) solid var(--sep-op);
+  max-width:560px;margin-inline:auto;padding:8px 8px calc(7px + var(--sab));
+  background:var(--nav-bg);border-radius:20px 20px 0 0;
+  border-top:var(--hair) solid rgba(255,255,255,.2);
 }
-:root[data-theme="light"] #tabbar{background:rgba(249,249,251,.94)}
+:root[data-theme="light"] #tabbar{background:var(--nav-bg)}
 #tabbar button{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  color:var(--label-2);font-size:10px;font-weight:500;letter-spacing:.005em;padding-top:3px;
+  flex:1;min-width:0;min-height:52px;display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:var(--nav-ink);font-size:var(--fs-caption2);line-height:1.1;font-weight:500;letter-spacing:0;padding-top:2px;
   transition:color var(--fast);
 }
+#tabbar button:focus-visible{outline-color:var(--nav-ink);outline-offset:2px;border-radius:14px}
 /* The inactive tint is semi-transparent, so wherever two strokes cross inside an
    icon (the calendar's hangers over its frame, the divider's caps on its sides)
    the alpha doubled up and the icon read as a stack of loose layers. Carrying the
    fade on the <svg> instead of in the stroke colour flattens the icon first and
    fades it as one shape — and it does that for every icon, not just this one. */
-#tabbar button .icn{font-size:25px;--icon-stroke:1.65;color:var(--label)}
-#tabbar button.on{color:var(--acc-ink)}
+#tabbar button .icn{font-size:23px;--icon-stroke:1.8;color:#fff}
+#tabbar button.on{color:var(--nav-ink);font-weight:700}
 #tabbar button.on .icn{--icon-stroke:2;color:inherit;opacity:1}
 /* A connection problem while the banner is switched off (Settings → Show connection status):
    a dot on the Home tab and on the Settings gear. */
-#tabbar .tab-ic{position:relative;display:inline-flex}
+#tabbar .tab-ic{position:relative;display:inline-flex;align-items:center;justify-content:center;width:36px;height:30px;border-radius:11px;background:var(--nav-icon-bg);color:#fff}
+#tabbar button.on .tab-ic{background:var(--lime);color:var(--brand-ink);box-shadow:0 2px 6px rgba(35,35,35,.14)}
 .tab-dot{
   position:absolute;top:-1px;right:-3px;width:8px;height:8px;border-radius:50%;
   background:var(--orange);box-shadow:0 0 0 2px var(--bg-el);pointer-events:none;
 }
 .iconbtn .tab-dot{top:5px;right:5px;box-shadow:0 0 0 2px var(--bg)}
-#tabbar button.start{margin-top:-24px}
+#tabbar .tab-dot{box-shadow:0 0 0 2px var(--nav-bg)}
+#tabbar button.start{margin-top:-18px}
 #tabbar button.start .cir{
-  width:52px;height:52px;border-radius:50%;background:var(--acc);color:var(--on-acc);
+  width:52px;height:52px;border-radius:19px;background:var(--acc);color:var(--on-acc);
   display:flex;align-items:center;justify-content:center;position:relative;
-  box-shadow:0 6px 18px -4px var(--acc);box-shadow:0 6px 18px -4px color-mix(in srgb,var(--acc) 55%,transparent);
+  box-shadow:0 4px 12px rgba(35,35,35,.2);
   transition:transform var(--fast) var(--ease);
 }
 #tabbar button.start:active .cir{transform:scale(.93)}
 #tabbar button.start .cir .icn{font-size:26px;--icon-stroke:2;color:inherit;opacity:1}
-#tabbar button.start span{color:var(--acc-ink);font-weight:600}
+#tabbar button.start span{color:var(--nav-ink);font-weight:600}
 #tabbar button.start .tab-time{font-variant-numeric:tabular-nums}
 /* `.cir` is itself a <span>, so the label rules above and below reach it too and
    outrank the `.cir` block — which is how the running state ended up painting an
@@ -649,9 +648,9 @@ h4.sec{
    The disc is orange in either theme, so its glyph is black, not `--on-acc`. */
 #tabbar button.start .cir{color:var(--on-acc)}
 #tabbar button.start.rec .cir{background:var(--orange);color:#000;box-shadow:0 6px 18px -4px var(--orange);box-shadow:0 6px 18px -4px color-mix(in srgb,var(--orange) 55%,transparent)}
-#tabbar button.start.rec span{color:var(--orange)}
+#tabbar button.start.rec span{color:var(--nav-ink)}
 #tabbar button.start.rec .cir::after{
-  content:'';position:absolute;inset:0;border-radius:50%;
+  content:'';position:absolute;inset:0;border-radius:inherit;
   border:2px solid var(--orange);animation:ping 1.9s var(--ease) infinite;
 }
 @keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.45);opacity:0}}
@@ -665,8 +664,8 @@ h4.sec{
    never had it, and "reduce transparency" accessibility settings drop it. Those surfaces go
    fully opaque instead. Keep this in sync with the rules above. */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  #tabbar{background:var(--bg-el)}
-  :root[data-theme="light"] #tabbar{background:#f9f9fb}
+  #tabbar{background:var(--nav-bg)}
+  :root[data-theme="light"] #tabbar{background:var(--nav-bg)}
   #timer{background:var(--surface-raised)}
   #toast{background:var(--surface-2)}
 }
@@ -675,8 +674,8 @@ h4.sec{
    Same opaque fills, on every translucent surface. */
 @media (prefers-reduced-transparency: reduce){
   #tabbar,#timer,#toast,.conn-bar,.whdr.stick,.stats-index{-webkit-backdrop-filter:none;backdrop-filter:none}
-  #tabbar{background:var(--bg-el)}
-  :root[data-theme="light"] #tabbar{background:#f9f9fb}
+  #tabbar{background:var(--nav-bg)}
+  :root[data-theme="light"] #tabbar{background:var(--nav-bg)}
   #timer{background:var(--surface-raised)}
   #toast{background:var(--surface-2)}
   .conn-bar,.whdr.stick,.stats-index{background:var(--bg)}
@@ -1004,7 +1003,7 @@ body.chips-dragging *{cursor:inherit}
    padding box, which is what the thumb needs. */
 .seg{
   position:relative;display:flex;
-  background:var(--surface-3);border-radius:9px;padding:2px;isolation:isolate;
+  background:var(--surface-2);border-radius:18px;padding:2px;isolation:isolate;
 }
 .seg>button{flex:1 1 0;min-width:0}
 :root[data-theme="light"] .seg{background:rgba(118,118,128,.12)}
@@ -1012,22 +1011,21 @@ body.chips-dragging *{cursor:inherit}
   position:absolute;z-index:0;top:2px;bottom:2px;inset-inline-start:2px;
   width:calc((100% - 4px)/var(--n));
   transform:translateX(calc(100% * var(--i)));
-  background:var(--surface);border-radius:7px;
+  background:var(--acc);border-radius:16px;
   box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.06);
   transition:transform var(--med) var(--ease);
 }
-:root[data-theme="light"] .seg-sel{background:#fff}
-/* Dark: the chosen segment is raised, a step lighter than its track, as on the iPhone. It used to
-   be --surface on a --surface-3 track, darker than the track, so the choice read as a dent pressed
-   into the control rather than the piece standing on it (design review 1.4.5). */
-:root:not([data-theme="light"]) .seg{background:rgba(118,118,128,.24)}
-:root:not([data-theme="light"]) .seg-sel{background:#636366;box-shadow:0 3px 8px rgba(0,0,0,.24),0 1px 1px rgba(0,0,0,.12)}
+:root[data-theme="light"] .seg-sel{background:var(--acc)}
+/* The filled selected pill uses the same tested fill/ink pair as primary actions. */
+:root:not([data-theme="light"]) .seg{background:var(--surface-2)}
+:root:not([data-theme="light"]) .seg-sel{background:var(--acc);box-shadow:0 3px 8px rgba(0,0,0,.18)}
 .seg button{
   position:relative;z-index:1;padding:6px 8px;font-size:14px;font-weight:500;
   letter-spacing:-.006em;color:var(--label);display:flex;align-items:center;
   justify-content:center;gap:5px;min-height:32px;transition:opacity var(--fast),transform var(--fast) var(--ease);
 }
 .seg button .icn{font-size:var(--fs-callout)}
+.seg button.on{color:var(--on-acc);font-weight:600}
 .seg button:not(.on){color:var(--label-2);font-weight:400}
 .seg button:active{transform:scale(var(--press-scale))}
 /* sitting in a list row: shrink to content instead of filling the row. The control never
@@ -1044,11 +1042,11 @@ body.chips-dragging *{cursor:inherit}
    Where the row does fit, the segments still share it out evenly (design review 1.4.5). */
 .seg.seg-scroll{overflow-x:auto;scrollbar-width:none;touch-action:pan-x;overscroll-behavior-x:contain}
 .seg.seg-scroll::-webkit-scrollbar{display:none}
-.seg.seg-scroll>button{flex:1 0 auto;padding-inline:12px;white-space:nowrap;border-radius:7px;transition:background var(--fast),opacity var(--fast)}
+.seg.seg-scroll>button{flex:1 0 auto;padding-inline:12px;white-space:nowrap;border-radius:16px;transition:background var(--fast),opacity var(--fast)}
 .seg.seg-scroll>.seg-sel{display:none}
-.seg.seg-scroll>button.on{background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.06)}
-:root[data-theme="light"] .seg.seg-scroll>button.on{background:#fff}
-:root:not([data-theme="light"]) .seg.seg-scroll>button.on{background:#636366}
+.seg.seg-scroll>button.on{background:var(--acc);box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.06)}
+:root[data-theme="light"] .seg.seg-scroll>button.on{background:var(--acc)}
+:root:not([data-theme="light"]) .seg.seg-scroll>button.on{background:var(--acc)}
 /* Every segment as wide as the widest label (QA 10-05: with flex:1 1 0 the track was sized by the
    labels' sum but split evenly, so "Compact" / "Versteckt" got less than its own width and
    touched the segment's edge). A grid of equal 1fr columns sizes each to the widest one, so the
@@ -1972,7 +1970,7 @@ body.no-tabbar #timer.countin{box-shadow:inset 0 var(--hair) 0 var(--acc),0 -10p
 :root[data-theme="light"] .sheet{background:var(--bg)}
 @keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
 .sheet .grab{width:36px;height:5px;border-radius:99px;background:var(--label-4);margin:6px auto 14px}
-.sheet h3{font-size:var(--fs-title3);font-weight:600;letter-spacing:-.021em;margin-bottom:14px}
+.sheet h3{font-size:var(--fs-title3);font-weight:700;letter-spacing:var(--ls-title);margin-bottom:16px}
 .picker-search{
   position:sticky;top:0;z-index:2;margin-bottom:0;padding-bottom:10px;
   background:var(--bg-el);
@@ -2422,7 +2420,7 @@ button.mchip{border:none;font:inherit;font-size:var(--fs-caption);cursor:pointer
   -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
   /* 22px, not a pill radius: one line (about 41px high) still reads as a pill, and a toast that
      wraps to four lines is a rounded box instead of a circle over the page. */
-  border-radius:var(--r-xl);padding:11px 20px;font-size:var(--fs-subhead);font-weight:500;
+  border-radius:22px;padding:11px 20px;font-size:var(--fs-subhead);font-weight:500;
   box-shadow:0 10px 30px -6px rgba(0,0,0,.5);
   opacity:0;pointer-events:none;transition:opacity var(--med),transform var(--med) var(--ease);
   /* As wide as its text up to 88vw. Without a width, left:50% left it half the screen to wrap

@@ -6,7 +6,7 @@ import { streakInfo } from '../lib/streak.js'
 import { StreakFlame, StreakMeta, StreakParty } from '../components/Streak.jsx'
 import { fmtNum, fmtDate, todayISO, isoOf, weekStartOf, weekDayOffset, DAYS, DAYN } from '../lib/format.js'
 import { t, tn, dateLocale } from '../lib/i18n.js'
-import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
+import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
 import LineChart from '../components/LineChart.jsx'
 import Icon from '../components/Icon.jsx'
 import CardHead from '../components/CardHead.jsx'
@@ -30,10 +30,7 @@ import { WrappedHomeCard } from '../components/WrappedEntry.jsx'
 import RecoveryHint from '../components/RecoveryHint.jsx'
 import { ChallengesCard } from '../components/Challenges.jsx'
 import { isOn } from '../lib/modules.js'
-import { manualCardioSheet } from '../components/ManualCardio.jsx'
-import { equipmentProfileSheet } from '../sheets.jsx'
-import { homeGymSetupSheet } from '../components/HomeGymSetup.jsx'
-import { HomeGymCircuitButton } from '../components/HomeGymCircuits.jsx'
+import { HomeGymLinks, HomeGymRoutines, HomeGymActions, KitIcon } from '../components/HomeGymDashboard.jsx'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -127,25 +124,18 @@ export default function Home() {
   const progChip = programmeChip(S)
   const onQueueStart = id => { if (S.active) nav('/workout'); else startFlow([id]) }
 
-  return <div className="narrow">
+  return <div className="narrow home-gym-screen">
     <div className="hdr">
       <SeasonDeco spot="header-bats" />
-      <div><h1>{user ? t('Hi {0}', user.name) : 'openGym'}</h1><div className="sub">{today.toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
-      <button className="iconbtn" data-tour="settings-gear" onClick={() => nav('/settings')} aria-label={trouble ? t('Settings') + ', ' + t('Connection problem') : t('Settings')}><Icon name="gear" />{trouble && <span className="tab-dot" aria-hidden="true" />}</button>
+      <div><h1>{user ? t('Hi {0}', user.name) : t('Home Gym')}</h1><div className="sub">{today.toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
+      <div className="hdr-actions"><button className="iconbtn" onClick={() => nav('/library')} aria-label={t('Search exercises')}><KitIcon name="search" /></button>
+        <button className="iconbtn" data-tour="settings-gear" onClick={() => nav('/settings')} aria-label={trouble ? t('Settings') + ', ' + t('Connection problem') : t('Settings')}><KitIcon name="profile" />{trouble && <span className="tab-dot" aria-hidden="true" />}</button></div>
     </div>
 
-    <section className="card home-gym-actions" aria-label={t('Home gym')}>
-      <div className="row between"><h3>{t('Home gym')}</h3><Button size="sm" variant="ghost" onClick={() => {
-        const profile = (S.equipProfiles || []).find(p => p.id === S.activeEquipId)
-        if (profile) equipmentProfileSheet(profile)
-        else homeGymSetupSheet()
-      }}>{t('My equipment')}</Button></div>
-      <p className="small dim">{t('Your strength sessions, walks, and runs in one place.')}</p>
-      <Button variant="tinted" icon="plus" onClick={manualCardioSheet}>{t('Log a walk or run')}</Button>
-      <div style={{ marginTop: 8 }}><HomeGymCircuitButton onSaved={id => nav('/plan/r/' + id)} /></div>
-    </section>
+    <HomeGymLinks />
+    <HomeGymRoutines />
 
-    <div className="card">
+    <section className="gym-week-band" aria-label={t('Your training week')}><div className="card gym-week-card">
       {/* A running programme (lib/programmes.js) wrote this week's plan: where it stands, one tap from its screen. */}
       {progChip && <button type="button" className="chip ichip prog-chip" onClick={() => nav('/plan/programmes')}><Icon name="calendar" /><span>{progChip}</span></button>}
       {/* A coach week runs by order, not by weekday, so its progress row stands in for the
@@ -204,7 +194,9 @@ export default function Home() {
         </Button>
       </div>}
       <SeasonDeco spot="home-hero" />
-    </div>
+    </div></section>
+
+    <HomeGymActions />
 
     {/* Monday: Your week; the 1st: Your month (lib/recap.js). Off in Settings → Look & Home. */}
     <RecapHomeCard S={S} />
@@ -227,14 +219,6 @@ export default function Home() {
       <div className="card tap-host checkin-card">
         <CardHead icon="qr" tint="var(--blue)" eyebrow={t('At the gym')} title={t('Check in')} open={{ onClick: () => nav('/checkin') }}
           action={<Icon name="chevronRight" className="chev" />} />
-      </div>
-    )}
-
-    {!S.routines.length && !S.active && (
-      <div className="card">
-        <CardHead icon="calendar" title={t('Welcome!')} sub={t('Set up your weekly routine to get going, or grab a ready-made starter plan.')} />
-        <Button variant="primary" icon="clipboard" onClick={starterPlanSheet}>{t('Load starter plan')}</Button>
-        <div style={{ height: 8 }} /><Button onClick={() => nav('/plan')}>{t('Build my own plan')}</Button>
       </div>
     )}
 

@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore.js'
 import { t, tn } from '../lib/i18n.js'
-import { WorkoutRow, DayNoteRow, workoutDetailSheet, logPastWorkoutSheet } from '../sheets.jsx'
+import { WorkoutRow, DayNoteRow, workoutDetailSheet, logPastWorkoutSheet, calendarSheet } from '../sheets.jsx'
 import { Button } from '../components/ui.jsx'
 import Icon from '../components/Icon.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { dayNoteOf } from '../lib/day-notes.js'
 import { reportSheet } from '../components/ReportSheet.jsx'
 import { CardioHistory, manualCardioSheet } from '../components/ManualCardio.jsx'
+import { walkRunHistory } from '../lib/manual-cardio.js'
 
 // Newest first: every workout, and in between them the days off you left a note on (#261). A
 // note on a day that has a workout too stays in the day sheet; the workout speaks for that day.
@@ -44,19 +45,27 @@ export default function History() {
     if (end.current) io.observe(end.current)
     return () => io.disconnect()
   }, [more, shown])
-  return <>
+  return <div className="gym-history">
     <div className="hdr"><button className="iconbtn" data-back="/stats" data-tour="history-back" onClick={() => nav('/stats')} aria-label={t('Stats')}><Icon name="chevronLeft" /></button>
       <div style={{ flex: 1, marginInlineStart: 12 }}><h1>{t('History')}</h1><div className="sub">{tn('{0} workout', '{0} workouts', S.workouts.length)}</div></div>
       {S.workouts.length > 0 && <button className="iconbtn" onClick={reportSheet} aria-label={t('Performance report')} title={t('Performance report')}><Icon name="note" /></button>}</div>
+    <div className="gym-history-summary">
+      <div><span>{t('Workouts')}</span><strong>{S.workouts.length}</strong></div>
+      <div><span>{t('Walks & runs')}</span><strong>{walkRunHistory(S).length}</strong></div>
+      <Button variant="ghost" icon="calendar" onClick={() => calendarSheet()}>{t('Calendar')}</Button>
+    </div>
+    <nav className="gym-progress-tabs" aria-label={t('Progress & history')}>
+      <button className="on" aria-current="page">{t('Workout log')}</button><button onClick={() => nav('/stats')}>{t('Charts')}</button>
+    </nav>
     <Button icon="plus" onClick={manualCardioSheet} style={{ marginBottom: 12 }}>{t('Log a walk or run')}</Button>
     <CardioHistory />
     {rows.length > 0 && <Button icon="plus" data-tour="history-add" onClick={logPastWorkoutSheet} style={{ marginBottom: 12 }}>{t('Log a past workout')}</Button>}
-    {rows.length ? <><div className="list">{(more ? rows.slice(0, shown) : rows).map((r, i) => r.w
+    {rows.length ? <><div className="list gym-history-list">{(more ? rows.slice(0, shown) : rows).map((r, i) => r.w
       ? <WorkoutRow key={r.w.id} w={r.w} tour={i === 0 ? 'history-row' : undefined} onClick={() => workoutDetailSheet(r.w)} />
       : <DayNoteRow key={'note-' + r.d} iso={r.d} note={r.note} />)}</div>
       {more && <div ref={end} aria-hidden="true" style={{ height: 1 }} />}</>
       : <EmptyState icon="history" text={t('No workouts yet. Your first one will land here.')}>
         <Button variant="tinted" icon="plus" data-tour="history-add" onClick={logPastWorkoutSheet}>{t('Log a past workout')}</Button>
       </EmptyState>}
-  </>
+  </div>
 }

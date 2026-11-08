@@ -103,7 +103,7 @@ describe('readable on the theme', () => {
     }
     // a grey that already stands apart is left alone
     expect(readableIn('#333333', 'light')).toBe('#333333')
-    expect(readableIn('#e0e0e0', 'dark')).toBe('#e0e0e0')
+    expect(readableIn('#f0f0f0', 'dark')).toBe('#f0f0f0')
     expect(isGrey('#ff00aa')).toBe(false)
   })
   it('lightens a very dark colour in dark mode and darkens a very light one in light mode', () => {

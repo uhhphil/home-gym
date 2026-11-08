@@ -36,6 +36,7 @@ const MEDIA_TRIM_EVERY = 20
 const isMediaPath = p => p.includes('/exercise-media/') || p.includes('/img/') || p.includes('/gif/')
 
 // The code the app loads only when it needs it (the photo and video ingest, the QR reader...),
+// plus bundled WOFF2 fonts and SVG icons so the first offline screen retains its design,
 // listed by the build (vite.config.js, scripts/sw-stamp.mjs). Without it the first photo added
 // offline after an update had no ingest to run. Unstamped (a dev server, a test) it is empty.
 const LAZY = '__LAZY__'
@@ -252,10 +253,10 @@ const API = (() => { try { return new URL('api/', location.href).pathname } catc
 // How long a request for the app itself waits on the network before a cached copy answers it.
 const NET_WAIT_MS = 3000
 
-// The build's own chunks and stylesheets (assets/<name>-<hash>.js|css): the name changes whenever
+// The build's own chunks, stylesheets, fonts and icons (assets/<name>-<hash>.js|css|woff2|svg): the name changes whenever
 // the content does, so a copy in this build's cache is the file, and a start serves them from
 // here instead of asking the network about each of them again (40-odd round trips before Home).
-const isHashedAsset = p => /\/assets\/[^/]+-[A-Za-z0-9_-]{8}\.(?:js|css)$/.test(p)
+const isHashedAsset = p => /\/assets\/[^/]+-[A-Za-z0-9_-]{8}\.(?:js|css|woff2|svg)$/.test(p)
 const cacheFirst = e => caches.match(e.request, { ignoreSearch: true }).then(hit => hit || fetch(e.request).then(res => {
   // Only a real answer is kept: an auth proxy's login page would otherwise stand in for the chunk
   // for the rest of this build.
