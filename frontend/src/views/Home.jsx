@@ -31,6 +31,7 @@ import RecoveryHint from '../components/RecoveryHint.jsx'
 import { ChallengesCard } from '../components/Challenges.jsx'
 import { isOn } from '../lib/modules.js'
 import { HomeGymLinks, HomeGymRoutines, HomeGymActions, KitIcon } from '../components/HomeGymDashboard.jsx'
+import { WhoopSummary } from '../components/Whoop.jsx'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -134,6 +135,7 @@ export default function Home() {
 
     <HomeGymLinks />
     <HomeGymRoutines />
+    <WhoopSummary />
 
     <section className="gym-week-band" aria-label={t('Your training week')}><div className="card gym-week-card">
       {/* A running programme (lib/programmes.js) wrote this week's plan: where it stands, one tap from its screen. */}

@@ -80,6 +80,17 @@ server {
         # 504 here while the API was still working on it, which told the admin the wrong thing.
         proxy_read_timeout 300s;
         proxy_send_timeout 300s;
+
+        # An OAuth callback contains a short-lived authorization code in its query. Neither
+        # the normal access log nor an upstream failure's error log may record that request.
+        # Inherit the API resolver, headers, limits and timeouts. Name the upstream directly:
+        # this exact location must not depend on the parent's rewrite-phase `set` executing.
+        # The mapped URI still makes DNS resolve per request. Other API logging stays on.
+        location = ${BASE_PATH}/api/whoop/callback {
+            access_log off;
+            error_log /dev/null;
+            proxy_pass http://${BACKEND}:${BACKEND_PORT}$api_request_uri;
+        }
     }
 
     # Photos and videos of custom exercises (PUT and GET under api/media/). Nginx picks the

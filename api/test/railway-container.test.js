@@ -25,7 +25,7 @@ test('backend port defaults retain Docker Compose and custom API port compatibil
 test('Railway can use its listener PORT independently of the private API port', () => {
   assert.equal(configuredPorts({ PORT: '8080', NGINX_PORT: '8080', BACKEND_PORT: '3000' }), '3000,8080,8080');
   const template = fs.readFileSync(nginxTemplate, 'utf8');
-  assert.equal(template.match(/http:\/\/\$\{BACKEND\}:\$\{BACKEND_PORT\}/g)?.length, 2, 'ordinary API and media uploads share the private port');
+  assert.equal(template.match(/http:\/\/\$\{BACKEND\}:\$\{BACKEND_PORT\}/g)?.length, 3, 'ordinary API, OAuth callbacks and media uploads share the private port');
   assert.doesNotMatch(template, /\$\{BACKEND\}:\$\{PORT\}/);
   assert.match(fs.readFileSync(webDockerfile, 'utf8'), /COPY --chmod=755 web\/15-backend-port\.envsh \/docker-entrypoint\.d\//);
 });

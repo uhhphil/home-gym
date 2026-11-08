@@ -247,7 +247,7 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
   <p class="api-facts">
     <span>OpenAPI 3.1.0</span>
     <span>openGym v1.4.3</span>
-    <span>92 endpoints</span>
+    <span>97 endpoints</span>
     <span>AGPL-3.0-or-later</span>
   </p>
 
@@ -279,11 +279,11 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
   </div>
   <div class="ov">
     <h3>Environment-dependent behavior</h3>
-<ul><li><code>INVITE_ONLY=1</code>: registration requires a valid invite code (minted by an admin).</li><li><code>ALLOW_GUEST=0</code>: hides the client-side &quot;continue without account&quot; mode; the server merely reports the flag via <code>GET /api/config</code> (guest mode never talks to this API at all).</li><li><code>ADMIN_UIDS=&lt;uid&gt;,&lt;uid&gt;</code>: user ids treated as admins (a <code>&quot;admin&quot;: true</code> flag on the user record in <code>db.json</code> works too). Admins get the <code>/api/admin/*</code> routes. One admin is the owner: the record with <code>&quot;owner&quot;: true</code>, else the first <code>ADMIN_UIDS</code> entry with a profile, else the oldest admin. Only the owner appoints and removes admins, deletes an admin, hands the role on and clears the audit log.</li><li><code>FIRST_USER_ADMIN</code> (default off; <code>1</code> turns it on): the first profile registered on an instance with no profiles gets that <code>&quot;admin&quot;: true</code> flag and is the owner. Decided at registration only, never applied to an instance that already has profiles.</li><li><code>AUDIT_LOG</code> (default on), <code>AUDIT_MAX</code> (default 5000 events), <code>AUDIT_DAYS</code> (default 90), <code>AUDIT_IP</code> (<code>off</code> | <code>net</code> | <code>full</code>, default off) shape the audit log served by <code>GET /api/admin/audit</code>.</li><li><code>PASSWORD_LOGIN=1</code>: adds the <code>password</code> routes and <code>password_login: true</code> in <code>GET /api/config</code>. Off by default.</li><li><code>DEFAULT_LANG</code> (e.g. <code>pt-BR</code>; unset by default): <code>default_lang</code> in <code>GET /api/config</code>, the language of the sign-in screen and of every profile that never picked one.</li><li><code>TRUST_PROXY=1</code>: the throttle reads the client address from proxy headers (set by the bundled <code>docker-compose.yml</code>, where only the web container can reach the API).</li><li><code>INTEGRATIONS</code> (unset by default, e.g. <code>webhook</code>): the providers of the <code>integrations</code> routes, and the <code>integrations</code> block of <code>GET /api/config</code>. <code>INTEGRATIONS_ALLOW_LAN=1</code> lets a webhook reach the home network (http too), never loopback or link-local.</li><li><code>MEDIA_UPLOADS</code> (default on; <code>0</code> removes the <code>media</code> routes and the <code>media</code> block of <code>GET /api/config</code>), <code>MEDIA_QUOTA_MB</code> (200 per profile, <code>0</code> = no cap), <code>MEDIA_IMAGE_MAX_MB</code> (2), <code>MEDIA_GIF_MAX_MB</code> (8), <code>MEDIA_VIDEO_MAX_MB</code> (40), <code>MEDIA_VIDEO_MAX_SEC</code> (60), <code>MEDIA_GC_GRACE_DAYS</code> (14), <code>MEDIA_UPLOADS_PER_HOUR</code> (600 per profile), <code>MEDIA_MIN_FREE_MB</code> (512, <code>0</code> = no floor): photos and videos of custom exercises (tag <code>media</code>). Every MB here is 2^20 bytes.</li></ul>
+<ul><li><code>INVITE_ONLY=1</code>: registration requires a valid invite code (minted by an admin).</li><li><code>ALLOW_GUEST=0</code>: hides the client-side &quot;continue without account&quot; mode; the server merely reports the flag via <code>GET /api/config</code> (guest mode never talks to this API at all).</li><li><code>ADMIN_UIDS=&lt;uid&gt;,&lt;uid&gt;</code>: user ids treated as admins (a <code>&quot;admin&quot;: true</code> flag on the user record in <code>db.json</code> works too). Admins get the <code>/api/admin/*</code> routes. One admin is the owner: the record with <code>&quot;owner&quot;: true</code>, else the first <code>ADMIN_UIDS</code> entry with a profile, else the oldest admin. Only the owner appoints and removes admins, deletes an admin, hands the role on and clears the audit log.</li><li><code>FIRST_USER_ADMIN</code> (default off; <code>1</code> turns it on): the first profile registered on an instance with no profiles gets that <code>&quot;admin&quot;: true</code> flag and is the owner. Decided at registration only, never applied to an instance that already has profiles.</li><li><code>AUDIT_LOG</code> (default on), <code>AUDIT_MAX</code> (default 5000 events), <code>AUDIT_DAYS</code> (default 90), <code>AUDIT_IP</code> (<code>off</code> | <code>net</code> | <code>full</code>, default off) shape the audit log served by <code>GET /api/admin/audit</code>.</li><li><code>PASSWORD_LOGIN=1</code>: adds the <code>password</code> routes and <code>password_login: true</code> in <code>GET /api/config</code>. Off by default.</li><li><code>DEFAULT_LANG</code> (e.g. <code>pt-BR</code>; unset by default): <code>default_lang</code> in <code>GET /api/config</code>, the language of the sign-in screen and of every profile that never picked one.</li><li><code>TRUST_PROXY=1</code>: the throttle reads the client address from proxy headers (set by the bundled <code>docker-compose.yml</code>, where only the web container can reach the API).</li><li><code>INTEGRATIONS</code> (unset by default, e.g. <code>webhook</code>): the providers of the <code>integrations</code> routes, and the <code>integrations</code> block of <code>GET /api/config</code>. <code>INTEGRATIONS_ALLOW_LAN=1</code> lets a webhook reach the home network (http too), never loopback or link-local.</li><li><code>WHOOP_CLIENT_ID</code>, <code>WHOOP_CLIENT_SECRET</code>, <code>WHOOP_REDIRECT_URI</code>: enable the separate read-only WHOOP account integration. The redirect must match ORIGIN and end in <code>/api/whoop/callback</code>. Secrets are server-only.</li><li><code>MEDIA_UPLOADS</code> (default on; <code>0</code> removes the <code>media</code> routes and the <code>media</code> block of <code>GET /api/config</code>), <code>MEDIA_QUOTA_MB</code> (200 per profile, <code>0</code> = no cap), <code>MEDIA_IMAGE_MAX_MB</code> (2), <code>MEDIA_GIF_MAX_MB</code> (8), <code>MEDIA_VIDEO_MAX_MB</code> (40), <code>MEDIA_VIDEO_MAX_SEC</code> (60), <code>MEDIA_GC_GRACE_DAYS</code> (14), <code>MEDIA_UPLOADS_PER_HOUR</code> (600 per profile), <code>MEDIA_MIN_FREE_MB</code> (512, <code>0</code> = no floor): photos and videos of custom exercises (tag <code>media</code>). Every MB here is 2^20 bytes.</li></ul>
   </div>
   <div class="ov">
     <h3>Conventions</h3>
-<ul><li>Every response body is JSON with <code>Cache-Control: no-store</code>. The one exception is <code>GET /api/media/{hash}</code>, which answers with the stored file itself (<code>Cache-Control: private, no-store</code>).</li><li>Errors are always <code>{&quot;error&quot;: &quot;&lt;human-readable message&gt;&quot;}</code>. The <code>password</code>, throttle and <code>media</code> routes add a stable <code>code</code> for the client to word in its own language.</li><li>Unknown method+path pairs return <code>404 {&quot;error&quot;:&quot;not found&quot;}</code>; an unhandled exception returns <code>500 {&quot;error&quot;:&quot;server error&quot;}</code>.</li><li>Every route that reads a request body requires <code>Content-Type: application/json</code> (a <code>charset</code> parameter is fine) and answers any other type with <code>415 {&quot;error&quot;:&quot;content-type must be application/json&quot;}</code> — the types a form can send are the ones that skip the CORS preflight, which is how a cross-site form reached these routes. A request with no body needs no Content-Type. A body that does not parse, or parses to anything but an object (<code>null</code>, a string, an array), is <code>400 {&quot;error&quot;:&quot;invalid json&quot;}</code> on every route that reads one; an empty body counts as <code>{}</code>. A body over 5 MiB is <code>413 {&quot;error&quot;:&quot;body too large&quot;}</code>; the rest of the upload is discarded so the answer reaches the client.</li><li>CORS: the request's <code>Origin</code> is reflected in <code>Access-Control-Allow-Origin</code> <b>without</b> <code>Allow-Credentials</code>, so cross-origin callers can only ever authenticate with a Bearer token, never with the cookie.</li></ul>
+<ul><li>Every response body is JSON with <code>Cache-Control: no-store</code>. The one exception is <code>GET /api/media/{hash}</code>, which answers with the stored file itself (<code>Cache-Control: private, no-store</code>). WHOOP callback returns a fixed 303 local redirect.</li><li>Errors are always <code>{&quot;error&quot;: &quot;&lt;human-readable message&gt;&quot;}</code>. The <code>password</code>, throttle and <code>media</code> routes add a stable <code>code</code> for the client to word in its own language.</li><li>Unknown method+path pairs return <code>404 {&quot;error&quot;:&quot;not found&quot;}</code>; an unhandled exception returns <code>500 {&quot;error&quot;:&quot;server error&quot;}</code>.</li><li>Every route that reads a request body requires <code>Content-Type: application/json</code> (a <code>charset</code> parameter is fine) and answers any other type with <code>415 {&quot;error&quot;:&quot;content-type must be application/json&quot;}</code> — the types a form can send are the ones that skip the CORS preflight, which is how a cross-site form reached these routes. A request with no body needs no Content-Type. A body that does not parse, or parses to anything but an object (<code>null</code>, a string, an array), is <code>400 {&quot;error&quot;:&quot;invalid json&quot;}</code> on every route that reads one; an empty body counts as <code>{}</code>. A body over 5 MiB is <code>413 {&quot;error&quot;:&quot;body too large&quot;}</code>; the rest of the upload is discarded so the answer reaches the client.</li><li>CORS: the request's <code>Origin</code> is reflected in <code>Access-Control-Allow-Origin</code> <b>without</b> <code>Allow-Credentials</code>, so cross-origin callers can only ever authenticate with a Bearer token, never with the cookie.</li></ul>
   </div>
     </div>
   </section>
@@ -3009,6 +3009,176 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
   <p class="sub">Settings → Integrations: outbound webhooks now, more providers later. Off unless the server runs with <code>INTEGRATIONS</code> (e.g. <code>INTEGRATIONS=webhook</code>); then a profile can add its own connections. Secrets are sealed at rest and shown once. See docs/INTEGRATIONS.md.</p>
   <div class="eps">
 
+<details class="ep" id="op-whoopStatus">
+  <summary>
+    <span class="m get">GET</span>
+    <span class="ep-path"><code>/api/whoop/status</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Read the caller's WHOOP connection and cached summaries</span>
+  </summary>
+  <div class="ep-body">
+<p>No provider network request. Tokens are never returned. Not part of workout state.</p>
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Requires a session: the cookie set at sign-in, or <code>Authorization: Bearer &lt;token&gt;</code> from mobile-app pairing.</span></p>
+
+
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s2">200</span>
+    <span class="p-desc">Configuration, connection and last complete 30-day snapshot.<span class="r-sig"><a href="#schema-WhoopStatus">WhoopStatus</a></span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">No session, expired/revoked session, or a disabled account.<span class="r-sig"><code>{&quot;error&quot;:&quot;not signed in&quot;}</code></span></span>
+  </div>
+    </div>
+  </div>
+</details>
+
+<details class="ep" id="op-whoopAuthorize">
+  <summary>
+    <span class="m post">POST</span>
+    <span class="ep-path"><code>/api/whoop/authorize</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Start WHOOP authorization for the signed-in browser profile</span>
+  </summary>
+  <div class="ep-body">
+<p>Requires WHOOP_CLIENT_ID, WHOOP_CLIENT_SECRET and WHOOP_REDIRECT_URI on the server. Returns only the official authorization URL and sets an HttpOnly, SameSite=Lax callback binding cookie. State expires in ten minutes and can be redeemed once. Use the browser, not the paired native app, to complete this flow.</p>
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Requires a session: the cookie set at sign-in, or <code>Authorization: Bearer &lt;token&gt;</code> from mobile-app pairing.</span></p>
+
+
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s2">200</span>
+    <span class="p-desc">Authorization URL and callback binding cookie.<span class="r-sig">{ url: string <span class="p-hint">(uri)</span> } &middot; sets <code>Set-Cookie</code></span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">No session, expired/revoked session, or a disabled account.<span class="r-sig"><code>{&quot;error&quot;:&quot;not signed in&quot;}</code></span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">429</span>
+    <span class="p-desc">Too many authorization attempts.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">503</span>
+    <span class="p-desc">WHOOP is not configured.</span>
+  </div>
+    </div>
+  </div>
+</details>
+
+<details class="ep" id="op-whoopCallback">
+  <summary>
+    <span class="m get">GET</span>
+    <span class="ep-path"><code>/api/whoop/callback</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Redeem WHOOP authorization for the same browser and profile</span>
+  </summary>
+  <div class="ep-body">
+
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Requires a session: the cookie set at sign-in, or <code>Authorization: Bearer &lt;token&gt;</code> from mobile-app pairing.</span></p>
+<p class="ep-h">Query parameters</p><div class="ptab">
+  <div class="prow">
+    <span class="p-name">state<em class="p-req" title="required">required</em></span>
+    <span class="p-type">string <span class="p-hint">(&le; 8 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">code</span>
+    <span class="p-type">string <span class="p-hint">(&le; 2048 chars)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">error</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+</div>
+
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s3">303</span>
+    <span class="p-desc">Fixed local redirect to integrations with whoop=connected or whoop=error. Clears the binding cookie; never returns tokens.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">No session, expired/revoked session, or a disabled account.<span class="r-sig"><code>{&quot;error&quot;:&quot;not signed in&quot;}</code></span></span>
+  </div>
+    </div>
+  </div>
+</details>
+
+<details class="ep" id="op-whoopSync">
+  <summary>
+    <span class="m post">POST</span>
+    <span class="ep-path"><code>/api/whoop/sync</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Refresh a complete 30-day WHOOP snapshot</span>
+  </summary>
+  <div class="ep-body">
+<p>Fetches all bounded pages of cycles, recoveries, sleeps and workouts; replaces the snapshot only after all succeed. Concurrent calls share one sync and token refresh. Maximum 20 pages / 500 records per resource, 1 MiB per response, 2 MiB per cache, and 90 seconds per sync. Provider IDs stay unchanged. Does not add gym workouts.</p>
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Requires a session: the cookie set at sign-in, or <code>Authorization: Bearer &lt;token&gt;</code> from mobile-app pairing.</span></p>
+
+
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s2">200</span>
+    <span class="p-desc">Updated connection and snapshot.<span class="r-sig"><a href="#schema-WhoopStatus">WhoopStatus</a></span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">Sign-in or WHOOP reconnection required.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">409</span>
+    <span class="p-desc">Missing or changed WHOOP connection.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">429</span>
+    <span class="p-desc">Local or WHOOP rate limit. Retry-After is seconds.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">502</span>
+    <span class="p-desc">Provider or response failure; previous complete snapshot retained.</span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s5">503</span>
+    <span class="p-desc">WHOOP is not configured.</span>
+  </div>
+    </div>
+  </div>
+</details>
+
+<details class="ep" id="op-whoopDisconnect">
+  <summary>
+    <span class="m post">POST</span>
+    <span class="ep-path"><code>/api/whoop/disconnect</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Delete the caller's WHOOP tokens and cached summaries</span>
+  </summary>
+  <div class="ep-body">
+<p>Cancels pending writes and attempts provider revocation. Does not modify workouts.</p>
+    <p class="ep-auth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Requires a session: the cookie set at sign-in, or <code>Authorization: Bearer &lt;token&gt;</code> from mobile-app pairing.</span></p>
+
+
+    <p class="ep-h">Responses</p>
+    <div class="ptab">
+  <div class="prow rrow">
+    <span class="r-code s2">200</span>
+    <span class="p-desc">Local data removed. If revocation failed, also revoke the app in WHOOP settings.<span class="r-sig">{ ok: always true, revokeRequired: boolean }</span></span>
+  </div>
+  <div class="prow rrow">
+    <span class="r-code s4">401</span>
+    <span class="p-desc">No session, expired/revoked session, or a disabled account.<span class="r-sig"><code>{&quot;error&quot;:&quot;not signed in&quot;}</code></span></span>
+  </div>
+    </div>
+  </div>
+</details>
+
 <details class="ep" id="op-listIntegrations">
   <summary>
     <span class="m get">GET</span>
@@ -4142,6 +4312,267 @@ main.api-main .lead { color: var(--fg-2); max-width: 58ch; margin: 14px 0 0; fon
        is <b>representative, not enforced</b>: the server stores it opaquely and the app
        grows it over time.</p>
     <div class="eps">
+
+<details class="ep sch" id="schema-WhoopStatus">
+  <summary>
+    <span class="sch-name"><code>WhoopStatus</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum"></span>
+  </summary>
+  <div class="ep-body">
+
+<div class="ptab">
+  <div class="prow">
+    <span class="p-name">configured<em class="p-req" title="required">required</em></span>
+    <span class="p-type">boolean</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">connected<em class="p-req" title="required">required</em></span>
+    <span class="p-type">boolean</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">lastSync<em class="p-req" title="required">required</em></span>
+    <span class="p-type">integer | null</span>
+    <span class="p-desc">Unix epoch milliseconds.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">error<em class="p-req" title="required">required</em></span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc">Safe human-readable connection error.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">data<em class="p-req" title="required">required</em></span>
+    <span class="p-type">null | <a href="#schema-WhoopSnapshot">WhoopSnapshot</a></span>
+    <span class="p-desc"></span>
+  </div>
+</div>
+  </div>
+</details>
+
+<details class="ep sch" id="schema-WhoopSnapshot">
+  <summary>
+    <span class="sch-name"><code>WhoopSnapshot</code></span>
+    <span class="ep-chev" aria-hidden="true"></span>
+    <span class="ep-sum">Read-only provider observations; unavailable scores are null, never inferred as zero.</span>
+  </summary>
+  <div class="ep-body">
+
+<div class="ptab">
+  <div class="prow">
+    <span class="p-name">accountId<em class="p-req" title="required">required</em></span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">syncedAt<em class="p-req" title="required">required</em></span>
+    <span class="p-type">integer</span>
+    <span class="p-desc">Unix epoch milliseconds.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles<em class="p-req" title="required">required</em></span>
+    <span class="p-type">object[]</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].id</span>
+    <span class="p-type">integer</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].start</span>
+    <span class="p-type">string <span class="p-hint">(date-time)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].end</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].updatedAt</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].scoreState</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].strain</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].averageHeartRate</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">cycles[].stepCount</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries<em class="p-req" title="required">required</em></span>
+    <span class="p-type">object[]</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].id</span>
+    <span class="p-type">string</span>
+    <span class="p-desc">Original sleep_id; recovery has no independent provider ID.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].sleepId</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].cycleId</span>
+    <span class="p-type">integer | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].createdAt</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].updatedAt</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].scoreState</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].score</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].hrv</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc">RMSSD milliseconds.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">recoveries[].restingHeartRate</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps<em class="p-req" title="required">required</em></span>
+    <span class="p-type">object[]</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].id</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].start</span>
+    <span class="p-type">string <span class="p-hint">(date-time)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].end</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].updatedAt</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].scoreState</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].nap</span>
+    <span class="p-type">boolean | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].performance</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">sleeps[].sleepMs</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc">Light plus deep plus REM sleep milliseconds; excludes awake time.</span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts<em class="p-req" title="required">required</em></span>
+    <span class="p-type">object[]</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].id</span>
+    <span class="p-type">string</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].start</span>
+    <span class="p-type">string <span class="p-hint">(date-time)</span></span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].end</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].updatedAt</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].scoreState</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].sport</span>
+    <span class="p-type">string | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].strain</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].averageHeartRate</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].maxHeartRate</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].distanceMeters</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+  <div class="prow">
+    <span class="p-name">workouts[].kilojoules</span>
+    <span class="p-type">number | null</span>
+    <span class="p-desc"></span>
+  </div>
+</div>
+  </div>
+</details>
 
 <details class="ep sch" id="schema-IntegrationEvent">
   <summary>

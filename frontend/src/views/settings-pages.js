@@ -199,6 +199,7 @@ export const SEARCH = [
   { page: 'data', title: 'Photos & videos', icon: 'image', tint: 'var(--teal)', kw: 'media storage photos videos upload', when: c => c.hasMedia },
   { page: 'data', title: 'Reset everything', icon: 'trash', tint: 'var(--red)', kw: 'delete wipe reset erase' },
   // Integrations: the cards (lib/integrations.js cardState says where each shows)
+  { page: 'integrations', title: 'WHOOP', icon: 'heart', tint: 'var(--green)', kw: 'whoop recovery sleep strain bluetooth heart rate sensor band' },
   { page: 'integrations', title: 'Apple Health', icon: 'heart', tint: 'var(--red)', mod: 'health', kw: 'apple health healthkit iphone heart rate watch', when: c => !c.mobile },
   { page: 'integrations', title: 'Health Connect', icon: 'heart', tint: 'var(--red)', mod: 'health', kw: 'health connect android google fit heart rate watch', when: c => !c.mobile },
   { page: 'integrations', title: 'Webhooks', icon: 'webhook', tint: 'var(--indigo)', mod: 'integrations', kw: 'webhook webhooks home assistant n8n ntfy node-red zapier ifttt automation notify', when: c => c.demo || !c.user || (c.integrations || []).includes('webhook') || !!c.user?.admin },

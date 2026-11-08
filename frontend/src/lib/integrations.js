@@ -18,6 +18,11 @@ export const CATEGORIES = [
 // `syncs`: the lines of "What it does" in the detail sheet.
 export const CARDS = [
   {
+    id: 'whoop', cat: 'health', name: 'WHOOP', icon: 'heart', tint: 'var(--green)',
+    desc: 'Recovery, sleep, strain and a separate live heart-rate sensor.',
+    syncs: ['Read-only account summaries from WHOOP.', 'Pair your band for live heart rate on supported devices.'],
+  },
+  {
     id: 'apple-health', cat: 'health', name: 'Apple Health', icon: 'heart', tint: 'var(--red)',
     desc: 'Workouts and weigh-ins out, heart rate and scale readings in.',
     syncs: ['Finished workouts and weigh-ins go to Apple Health.', 'Heart rate from your watch fills in each set.', 'Weigh-ins from your smart scale land here.'],
@@ -96,6 +101,8 @@ const healthTrouble = h => !!(h && ((h.on && h.error === 'permission') || (healt
 export function cardState(id, ctx) {
   const phone = ctx.mobile ? ctx.platform : null
   switch (id) {
+    case 'whoop':
+      return { status: null, action: 'open' }
     case 'apple-health':
     case 'health-connect': {
       const mine = id === 'apple-health' ? 'ios' : 'android'

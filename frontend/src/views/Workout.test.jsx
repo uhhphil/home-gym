@@ -11,6 +11,7 @@ import { isWarmupRow } from '../lib/workout-model.js'
 import { discardedFor } from '../lib/watch-sync.js'
 import { finishWorkout, finishWorkoutSheet } from '../sheets.jsx'
 import { menuItemsOf } from '../lib/menu-items.js'
+import { whoopSheet } from '../components/Whoop.jsx'
 
 // A menu's actions in order, whether it came as one list or in groups (menuSheet `sections`).
 
@@ -2460,26 +2461,27 @@ describe('workout view header menu', () => {
   }
   const item = (menu, label) => menuItemsOf(menu).find(it => it.label === label)
 
-  // The header ⋮ now leads with "Add routine"; the layouts moved to a nested "Layout" sheet.
+  // Layout choices live in their own nested sheet.
   const openLayout = async menu => {
     await act(async () => { item(menu, 'Layout').onClick() })
     return mocks.menuSheet.mock.calls.at(-1)[0]
   }
 
-  it('leads with Workout settings and the three things done mid-session, folds the rest under More, no Discard (#751), then a Layout sheet with the four layouts marked current', async () => {
+  it('leads with workout settings and live sensor access, folds occasional actions under More, no Discard (#751), then a Layout sheet with the four layouts marked current', async () => {
     await mount([exercise('plain-bench', [false])], 0, { active: { workoutView: 'list', routineIds: [] } })
 
     const menu = await openMenu()
-    // v1.4.4: four rows on show, the once-in-a-while ones in one More fold.
+    // Settings and sensor access stay reachable above the mid-session actions.
     expect(menu.sections.map(g => g.more ? 'more' : g.items.filter(Boolean).map(it => it.label))).toEqual([
-      ['Workout settings'], ['Add exercise', 'Add session note', 'Layout'], 'more',
+      ['Workout settings', 'Heart rate sensor'], ['Add exercise', 'Add session note', 'Layout'], 'more',
     ])
     expect(menuItemsOf({ sections: menu.sections[2].more }).map(it => it.label)).toEqual(['Add routine', 'Rename workout', 'Don’t count for progression'])
     // No Discard here: it ended this menu as a red trash, right where the exercise ⋯ keeps
     // Remove exercise, and got hit by mistake (#751). The Finish sheet has it.
     expect(menuItemsOf(menu).map(it => it.label)).toEqual([
-      'Workout settings', 'Add exercise', 'Add session note', 'Layout', 'Add routine', 'Rename workout', 'Don’t count for progression',
+      'Workout settings', 'Heart rate sensor', 'Add exercise', 'Add session note', 'Layout', 'Add routine', 'Rename workout', 'Don’t count for progression',
     ])
+    expect(item(menu, 'Heart rate sensor').onClick).toBe(whoopSheet)
     expect(menuItemsOf(menu).some(it => it.danger)).toBe(false)
     expect(item(menu, 'Workout settings').sub).toBe('1:30 rest · Silent')
     expect(item(menu, 'Don’t count for progression')).toMatchObject({ sub: 'Every exercise in this workout', on: false })
@@ -2492,6 +2494,14 @@ describe('workout view header menu', () => {
     expect(menuItemsOf(layout).map(it => it.label)).toEqual(['Cards', 'List', 'Compact', 'Focus', 'Collapse completed exercises'])
     expect(item(layout, 'List').on).toBe(true)
     expect(item(layout, 'Cards').on).toBe(false)
+  })
+
+  it.each([
+    ['editing a saved workout', { editingWorkoutId: 'saved' }],
+    ['backfilling a past workout', { backfill: { durationMin: 60, replaceId: null } }],
+  ])('does not offer a live heart rate sensor while %s', async (_label, active) => {
+    await mount([exercise('plain-bench', [false])], 0, { active })
+    expect(item(await openMenu(), 'Heart rate sensor')).toBeUndefined()
   })
 
   it('marks Focus current in the Layout sheet when the session is in the focus view', async () => {

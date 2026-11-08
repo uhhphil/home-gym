@@ -395,7 +395,29 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://localhost:8080/ >/dev/null 2>&1 && break; sleep 1; done
           curl -fsS http://localhost:8080/ | grep -q 'id="root"'
           curl -fsS http://localhost:8080/api/config | grep -q '"invite_only"'
-          docker rm -f web api-default
+          # Real nginx regression: the exact OAuth callback still reaches the API, but no
+          # authorization code leaks through access logs OR upstream-failure error logs.
+          # Exercise the nested location with and without a deployment prefix.
+          docker run -d --name web-subpath --network og -e BASE_PATH=/gym -p 8081:80 opengym-web:ci
+          for i in $(seq 1 30); do curl -fsS http://localhost:8081/gym/api/config >/dev/null 2>&1 && break; sleep 1; done
+          for base in http://localhost:8080 http://localhost:8081/gym; do
+            callback_status=$(curl --max-time 15 -sS -o /tmp/whoop-callback-body -w '%{http_code}' "$base/api/whoop/callback?code=WHOOP-CODE-DO-NOT-LOG-CI&state=STATE-CI")
+            printf 'OAuth callback at %s: HTTP %s (expected 401)\n' "$base" "$callback_status"
+            test "$callback_status" = 401
+            grep -q 'not signed in' /tmp/whoop-callback-body
+          done
+          docker stop api-default
+          for base in http://localhost:8080 http://localhost:8081/gym; do
+            callback_status=$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' "$base/api/whoop/callback?code=WHOOP-CODE-DO-NOT-LOG-CI&state=STATE-CI")
+            printf 'OAuth callback with stopped API at %s: HTTP %s (expected 502)\n' "$base" "$callback_status"
+            test "$callback_status" = 502
+          done
+          for container in web web-subpath; do
+            docker logs "$container" > "/tmp/$container.log" 2>&1
+            grep -q '/api/config' "/tmp/$container.log"
+            ! grep -qE 'WHOOP-CODE-DO-NOT-LOG-CI|STATE-CI|/api/whoop/callback' "/tmp/$container.log"
+          done
+          docker rm -f web web-subpath api-default
 
       - name: the coach image carries a runnable Agent SDK
         run: |

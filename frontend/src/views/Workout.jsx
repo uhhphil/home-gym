@@ -39,6 +39,7 @@ import { afterScrollRestore, scrollRestorePending } from '../components/Modals.j
 import { effortColor } from '../lib/effort.js'
 import Elapsed from '../components/Elapsed.jsx'
 import LiveHeartRate from '../components/LiveHeartRate.jsx'
+import { whoopSheet } from '../components/Whoop.jsx'
 import Icon from '../components/Icon.jsx'
 import { Button, Check, NumberField } from '../components/ui.jsx'
 import { defaultIncrement, weightIncrement, stepWeight } from '../lib/progression.js'
@@ -1740,6 +1741,7 @@ function ActiveWorkout() {
         { icon: 'gear', accent: true, chevron: true, label: t('Workout settings'),
           sub: [S.restSec > 0 ? t('{0} rest', fmtRest(S.restSec)) : t('No rest timer'), S.sound ? t('Sound') : t('Silent')].join(' · '),
           onClick: workoutSettingsSheet },
+        !(A.backfill || editing) && { icon: 'heart', label: t('Heart rate sensor'), onClick: whoopSheet },
       ] },
       { items: [
         A.backfill && A.entries.length > 0 && { icon: 'checkCircle', label: t('Mark all sets done'), onClick: markAllDone },
@@ -2403,7 +2405,7 @@ function ActiveWorkout() {
       {editing
         ? <button className="iconbtn" aria-label={t('Close editor')} title={t('Close editor')} onClick={() => exitWorkoutEdit()}><Icon name="xmark" /></button>
         : <button className="iconbtn" aria-label={t('Minimize')} title={t('Minimize')} onClick={() => nav('/home')}><Icon name="chevronDown" /></button>}
-      <div className="whdr-mid"><div className="whdr-name">{A.name}</div><div className="sub">{(A.backfill || editing) ? fmtDate(A.d, true) : <Elapsed start={A.start} />} · {t('{0} sets', done + '/' + total)}{!(A.backfill || editing) && isOn(S, 'health') && <LiveHeartRate />}</div>{gymShown && (gymSwitchable
+      <div className="whdr-mid"><div className="whdr-name">{A.name}</div><div className="sub">{(A.backfill || editing) ? fmtDate(A.d, true) : <Elapsed start={A.start} />} · {t('{0} sets', done + '/' + total)}{!(A.backfill || editing) && <LiveHeartRate phoneEnabled={isOn(S, 'health')} />}</div>{gymShown && (gymSwitchable
         ? <button type="button" className="whdr-gym" onClick={openGymMenu} aria-label={t('Gym: {0}', gymShown)}><Icon name="house" />{gymShown}</button>
         : <span className="whdr-gym"><Icon name="house" />{gymShown}</span>)}</div>
       {!chipRow && sessionMap}
