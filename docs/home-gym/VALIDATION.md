@@ -81,8 +81,8 @@ Actual container images, deployment health, public transport, application shell,
 ## WHOOP increment (2026-11-08)
 
 - Same React/Node/Capacitor architecture, no new dependencies. No changes to existing exercise, workout, routine IDs or the workout synchronization protocol.
-- Provider fixtures test OAuth browser/profile binding, state expiry/replay, encrypted token storage, refresh serialization, stable-ID deduplication, bounded pagination, failed-page retention and disconnect/account removal races.
+- Full API suite: **822 tests pass**, including the WHOOP routes and OpenAPI coverage. Provider fixtures test OAuth browser/profile binding, state expiry/replay, encrypted token storage, refresh serialization, stable-ID deduplication, bounded pagination, failed-page retention and disconnect/account removal races.
 - Frontend fixtures test profile-switch isolation, cached data after failed refresh, unknown scores, revoked access, disconnect/export boundaries, and explicit sensor selection. BLE fixtures cover 8/16-bit measurements, optional fields, contact loss, staleness and connection lifecycle races.
 - Full frontend suite: **7,921 tests across 661 files pass**. Production web build passes. A 390×844 browser check showed the WHOOP account/sensor sheet without layout overflow or console errors. This is a Chromium rendering check, not iPhone Bluetooth validation.
-- Swift syntax and plist/project syntax checks pass; Xcode.app is not installed. No simulator or physical-device result is claimed.
+- Swift syntax and plist/project syntax checks pass; Xcode.app is not installed locally. GitHub iOS checks track simulator compilation separately; local syntax checks are not an iOS build or physical-device result.
 - WHOOP credentials and the owner's app profile are not configured. Provider OAuth, real account sync, real HR notifications and reconnect/foreground tests are pending; see [WHOOP.md](WHOOP.md).
